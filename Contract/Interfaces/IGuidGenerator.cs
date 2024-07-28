@@ -1,6 +1,6 @@
-﻿namespace MuonroiBuildingBlock.Contract.Interfaces
+﻿namespace MBuildingBlock.Contract.Interfaces
 {
-    public interface IGuidGenerator
+    internal interface IGuidGenerator
     {
         Guid Create();
     }
