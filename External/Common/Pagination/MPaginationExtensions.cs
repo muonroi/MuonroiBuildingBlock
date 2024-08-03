@@ -3,7 +3,7 @@
     public static class MPaginationExtensions
     {
         public static IServiceCollection AddPaginationConfigs<TPaging>(this IServiceCollection services, IConfiguration configuration, TPaging paginationConfigs)
-            where TPaging : MPaginationConfigs
+            where TPaging : MPaginationConfig
         {
             configuration.GetSection(paginationConfigs.SectionName).Bind(paginationConfigs);
             if (paginationConfigs.DefaultPageIndex < 1)

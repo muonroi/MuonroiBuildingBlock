@@ -1,6 +1,6 @@
 ﻿namespace MBuildingBlock.External
 {
-    public static class MlicationExtensions
+    public static class ApplicationExtensions
     {
         public static IServiceCollection AddApplication(this IServiceCollection services, params Assembly[] assemblies)
         {
@@ -46,12 +46,6 @@
             return services;
         }
 
-        public static IServiceCollection AddAuthContext(this IServiceCollection services)
-        {
-            _ = services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            return services;
-        }
-
         public static WebApplication AddLocalization(this WebApplication app, Assembly assembly)
         {
             IMJsonSerializeService jsonSerializeService = app.Services.GetRequiredService<IMJsonSerializeService>();
@@ -67,37 +61,6 @@
                                reloadOnChange: true)
                 .AddEnvironmentVariables();
             return builder;
-        }
-
-        public static IServiceCollection AddControllerConfiguration(this IServiceCollection services, Assembly assemblies)
-        {
-            _ = services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
-            _ = services.AddControllers(options =>
-            {
-                options.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
-            }).AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                options.JsonSerializerOptions.Converters.Add(new MDateTimeConverter());
-            }).AddControllersAsServices();
-
-            //This method must be called after AddControllers
-            _ = services.AddFluentValidationAutoValidation();
-            _ = services.AddValidatorsFromAssembly(assemblies);
-
-            return services;
-        }
-
-        public static IServiceCollection AddConfigureHttpJson(this IServiceCollection services)
-        {
-            _ = services.ConfigureHttpJsonOptions(options =>
-            {
-                options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.SerializerOptions.WriteIndented = false;
-                options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-            });
-            return services;
         }
     }
 }
