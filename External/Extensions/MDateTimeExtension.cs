@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Extentions
+﻿namespace Muonroi.BuildingBlock.External.Extensions
 {
     public static class MDateTimeExtension
     {

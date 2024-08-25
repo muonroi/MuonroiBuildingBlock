@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.InternalEvents
+﻿namespace Muonroi.BuildingBlock.External.InternalEvents
 {
     public class MEntityCreatedEvent<T>(T entity) : INotification where T : MEntity
     {

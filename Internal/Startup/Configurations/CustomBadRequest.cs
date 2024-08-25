@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.Internal.Startup.Configurations
+﻿namespace Muonroi.BuildingBlock.Internal.Startup.Configurations
 {
     internal class CustomBadRequest : MVoidMethodResult
     {
@@ -38,11 +38,6 @@
                     AddErrorMessage("ERR_COM_INVALID_FORMAT", string.Format(CultureInfo.InvariantCulture, format, key), [MHelpers.GenerateErrorResult(key, "cannot get the value!")]);
                 }
             }
-        }
-
-        private static string GetErrorMessage(ModelError error)
-        {
-            return string.IsNullOrEmpty(error.ErrorMessage) ? "The input was not valid." : error.ErrorMessage;
         }
     }
 }

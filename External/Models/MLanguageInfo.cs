@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Models
+﻿namespace Muonroi.BuildingBlock.External.Models
 {
     /// <summary>
     /// Represents an available language for the application.

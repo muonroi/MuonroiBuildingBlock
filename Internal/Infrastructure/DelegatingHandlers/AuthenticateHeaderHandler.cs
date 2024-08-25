@@ -1,14 +1,14 @@
-﻿namespace MBuildingBlock.Internal.Infrastructure.DelegatingHandlers
+﻿namespace Muonroi.BuildingBlock.Internal.Infrastructure.DelegatingHandlers
 {
-    internal class AuthHeaderHandler : DelegatingHandler
+    internal class AuthenticateHeaderHandler : DelegatingHandler
     {
         private readonly Microsoft.Extensions.Logging.ILogger _logger;
 
-        private readonly MAuthInfoContext _authContext;
+        private readonly MAuthenticateInfoContext _authContext;
 
         public IConfiguration _configuration;
 
-        public AuthHeaderHandler(ILogger<AuthHeaderHandler> logger, MAuthInfoContext authContext, IConfiguration configuration)
+        public AuthenticateHeaderHandler(ILogger<AuthenticateHeaderHandler> logger, MAuthenticateInfoContext authContext, IConfiguration configuration)
         {
             _logger = logger;
             _authContext = authContext;

@@ -2,21 +2,18 @@
 {
     namespace MBuildingBlock.Entity
     {
-        // Lớp cơ sở cho IdentityDbContext với các chức năng liên quan đến Identity
         public class MBaseIdentityDbContext<TUser, TRole> : IdentityDbContext<TUser, TRole, Guid> where TUser : IdentityUser<Guid> where TRole : IdentityRole<Guid>
         {
             private readonly IMediator _mediator;
             private IDbContextTransaction? _currentTransaction;
             public bool HasActiveTransaction => _currentTransaction != null;
-            private readonly List<global::MBuildingBlock.External.Entity.MEntity> _trackEntities = [];
+            private readonly List<MEntity> _trackEntities = [];
 
-            // Phương thức lấy giao dịch hiện tại
             public IDbContextTransaction? GetCurrentTransaction()
             {
                 return _currentTransaction;
             }
 
-            // Phương thức lưu các thay đổi vào cơ sở dữ liệu và phát tán các sự kiện miền
             public async Task<Guid> SaveEntitiesAsync(CancellationToken cancellationToken = default)
             {
                 IExecutionStrategy strategy = Database.CreateExecutionStrategy();
@@ -52,10 +49,9 @@
                 });
             }
 
-            // Phương thức phát tán các sự kiện miền
             private async Task DispatchDomainEventsAsync()
             {
-                IEnumerable<global::MBuildingBlock.External.Entity.MEntity> domainEntities = _trackEntities.Where(x => x.DomainEvents != null && x.DomainEvents.Count > 0).Distinct();
+                IEnumerable<global::Muonroi.BuildingBlock.External.Entity.MEntity> domainEntities = _trackEntities.Where(x => x.DomainEvents != null && x.DomainEvents.Count > 0).Distinct();
                 List<INotification> domainEvents = domainEntities.SelectMany(x => x.DomainEvents ?? []).ToList();
                 domainEntities.ToList().ForEach(entity =>
                 {
@@ -70,7 +66,6 @@
                 await Task.WhenAll(tasks);
             }
 
-            // Phương thức bắt đầu giao dịch
             public async Task<IDbContextTransaction?> BeginTransactionAsync()
             {
                 if (_currentTransaction != null)
@@ -82,7 +77,6 @@
                 return _currentTransaction;
             }
 
-            // Phương thức cam kết giao dịch
             public async Task CommitTransactionAsync(IDbContextTransaction transaction)
             {
                 ArgumentNullException.ThrowIfNull(transaction, nameof(transaction));
@@ -109,7 +103,6 @@
                 }
             }
 
-            // Phương thức hủy bỏ giao dịch
             public void RollbackTransaction()
             {
                 try
@@ -123,13 +116,11 @@
                 }
             }
 
-            // Phương thức theo dõi thực thể
-            public void TrackEntity(global::MBuildingBlock.External.Entity.MEntity entity)
+            public void TrackEntity(MEntity entity)
             {
                 _trackEntities.Add(entity);
             }
 
-            // Hàm khởi tạo của lớp
             public MBaseIdentityDbContext(DbContextOptions options, IMediator mediator)
                 : base(options)
             {

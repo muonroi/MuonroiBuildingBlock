@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Filters
+﻿namespace Muonroi.BuildingBlock.External.Filters
 {
     public class AmqpContext : IAmqpContext
     {

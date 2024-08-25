@@ -1,4 +1,6 @@
-﻿namespace MBuildingBlock.Internal.Behaviours
+﻿using Muonroi.BuildingBlock.External.Extensions;
+
+namespace Muonroi.BuildingBlock.Internal.Behaviours
 {
     internal class LoggingBehavior<TRequest, TResponse>(ILogger<LoggingBehavior<TRequest, TResponse>> logger) : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
     {

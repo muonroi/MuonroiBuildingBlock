@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Helper
+﻿namespace Muonroi.BuildingBlock.External.Helper
 {
     public static class MPasswordHelper
     {

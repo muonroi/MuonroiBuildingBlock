@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.ORMs.Dapper.Handlers;
+﻿namespace Muonroi.BuildingBlock.External.ORMs.Dapper.Handlers;
 
 public class MTrimStringHandler : SqlMapper.TypeHandler<string>
 {

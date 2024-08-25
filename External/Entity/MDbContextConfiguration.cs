@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Entity
+﻿namespace Muonroi.BuildingBlock.External.Entity
 {
     public static class MDbContextConfiguration
     {

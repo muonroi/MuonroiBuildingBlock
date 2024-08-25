@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Common.ValidationObject
+﻿namespace Muonroi.BuildingBlock.External.Common.ValidationObject
 {
     public class MValidationObject
     {

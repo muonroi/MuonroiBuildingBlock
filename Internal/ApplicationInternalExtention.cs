@@ -1,6 +1,6 @@
-﻿namespace MBuildingBlock.Internal
+﻿namespace Muonroi.BuildingBlock.Internal
 {
-    internal static class ApplicationInternalExtention
+    internal static class ApplicationInternalExtension
     {
         internal static IServiceCollection AddControllerConfiguration(this IServiceCollection services, Assembly assemblies)
         {
@@ -14,7 +14,6 @@
                 options.JsonSerializerOptions.Converters.Add(new MDateTimeConverter());
             }).AddControllersAsServices();
 
-            //This method must be called after AddControllers
             _ = services.AddFluentValidationAutoValidation();
             _ = services.AddValidatorsFromAssembly(assemblies);
 

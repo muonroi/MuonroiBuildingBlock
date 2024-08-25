@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Timing
+﻿namespace Muonroi.BuildingBlock.External.Timing
 {
     public interface IClockProvider
     {

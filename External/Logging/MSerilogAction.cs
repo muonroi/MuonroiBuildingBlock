@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Logging;
+﻿namespace Muonroi.BuildingBlock.External.Logging;
 
 public static class MSerilogAction
 {

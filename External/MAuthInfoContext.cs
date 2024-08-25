@@ -1,6 +1,6 @@
-﻿namespace MBuildingBlock.External
+﻿namespace Muonroi.BuildingBlock.External
 {
-    public partial class MAuthInfoContext
+    public partial class MAuthenticateInfoContext
     {
         public string UserId { get; set; } = string.Empty;
         public string CorrelationId { get; set; } = string.Empty;
@@ -16,7 +16,7 @@
         public string AgentCode { get; set; } = string.Empty;
         public bool IsAuthenticated { get; set; }
 
-        public MAuthInfoContext()
+        public MAuthenticateInfoContext()
         { }
     }
 }

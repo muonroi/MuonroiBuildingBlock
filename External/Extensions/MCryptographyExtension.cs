@@ -1,6 +1,6 @@
-﻿namespace MBuildingBlock.External.Extentions;
+﻿namespace Muonroi.BuildingBlock.External.Extensions;
 
-public static class MCryptographyExtention
+public static class MCryptographyExtension
 {
     public static string Encrypt(string key, string plainText)
     {

@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Common.Constants
+﻿namespace Muonroi.BuildingBlock.External.Common.Constants
 {
     public class MTokenInfo(string sectionName = "TokenConfigs")
     {

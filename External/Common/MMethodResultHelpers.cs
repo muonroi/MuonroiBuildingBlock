@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Common
+﻿namespace Muonroi.BuildingBlock.External.Common
 {
     public static class MMethodResultHelpers
     {

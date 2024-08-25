@@ -1,11 +1,25 @@
-﻿namespace MBuildingBlock.External.Entity
+﻿using Muonroi.BuildingBlock.External.Entity.EFConfig;
+
+namespace Muonroi.BuildingBlock.External.Entity
 {
-    public class MDbContext : DbContext, IMUnitOfWork, IDisposable
+    public class MDbContext : DbContext, IMUnitOfWork, IDisposable, IIdentityAuth
     {
         private readonly IMediator _mediator;
 
         private IDbContextTransaction? _currentTransaction;
+
         public bool HasActiveTransaction => _currentTransaction != null;
+
+        public DbSet<MUserAccount> UserAccounts { get; set; }
+        public DbSet<MUser> Users { get; set; }
+        public DbSet<MRole> Roles { get; set; }
+        public DbSet<MPermission> Permissions { get; set; }
+        public DbSet<MUserRole> UserRoles { get; set; }
+        public DbSet<MLanguage> Languages { get; set; }
+        public DbSet<MUserLogin> UserLogins { get; set; }
+        public DbSet<MUserToken> UserTokens { get; set; }
+        public DbSet<MUserLoginAttempt> MUserLoginAttempts { get; set; }
+
         private readonly List<MEntity> _trackEntities = [];
 
         public IDbContextTransaction? GetCurrentTransaction()

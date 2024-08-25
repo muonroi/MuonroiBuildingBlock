@@ -1,4 +1,8 @@
-﻿namespace MBuildingBlock.External.Entity.Identity
+﻿using Muonroi.BuildingBlock.External.Entity;
+using Muonroi.BuildingBlock.External.Extensions;
+using Muonroi.BuildingBlock.External.Timing;
+
+namespace Muonroi.BuildingBlock.External.Entity.Identity
 {
     [Table("MUsers")]
     public class MUser : MEntity

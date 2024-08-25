@@ -1,8 +1,8 @@
-﻿namespace MBuildingBlock.Internal.Infrastructure.DI
+﻿namespace Muonroi.BuildingBlock.Internal.Infrastructure.DI
 {
-    internal static class DepedencyInternalInjection
+    internal static class DependencyInternalInjection
     {
-        internal static IServiceCollection ResolveDepedencyScope(this IServiceCollection services, Assembly assembly)
+        internal static IServiceCollection ResolveDependencyScope(this IServiceCollection services, Assembly assembly)
         {
             IEnumerable<Type> businessServices = assembly.GetTypes()
             .Where(x => x.GetInterfaces().Any(i => i.Name == typeof(IMRepository<>).Name || i.Name == typeof(IMQueries<>).Name)

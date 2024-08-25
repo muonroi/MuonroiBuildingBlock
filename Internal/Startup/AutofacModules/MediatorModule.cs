@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.Internal.Startup.AutofacModules
+﻿namespace Muonroi.BuildingBlock.Internal.Startup.AutofacModules
 {
     internal class MediatorModule : Module
     {

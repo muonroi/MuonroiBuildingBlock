@@ -1,10 +1,10 @@
-﻿namespace MBuildingBlock.External.SeedWorks
+﻿namespace Muonroi.BuildingBlock.External.SeedWorks
 {
     public class MQuery<T> : IMQueries<T> where T : MEntity
     {
         protected readonly MDbContext _dbBaseContext;
 
-        protected readonly MAuthInfoContext _authContext;
+        protected readonly MAuthenticateInfoContext _authContext;
 
         protected readonly DbSet<T> _dbSet;
 
@@ -16,7 +16,7 @@
                                           where !m.IsDeleted
                                           select m;
 
-        public MQuery(MDbContext dbContext, MAuthInfoContext authContext)
+        public MQuery(MDbContext dbContext, MAuthenticateInfoContext authContext)
         {
             _dbBaseContext = dbContext;
             _authContext = authContext;

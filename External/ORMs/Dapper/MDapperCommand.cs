@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.ORMs.Dapper;
+﻿namespace Muonroi.BuildingBlock.External.ORMs.Dapper;
 
 public class MDapperCommand
 {

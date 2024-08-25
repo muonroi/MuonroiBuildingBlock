@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Common.Enums
+﻿namespace Muonroi.BuildingBlock.External.Common.Enums
 {
     public enum MLoginResultType : byte
     {

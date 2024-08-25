@@ -1,4 +1,8 @@
-﻿namespace MBuildingBlock.External.Entity.Identity
+﻿using Muonroi.BuildingBlock.External.Common.Enums;
+using Muonroi.BuildingBlock.External.Entity;
+using Muonroi.BuildingBlock.External.Timing;
+
+namespace Muonroi.BuildingBlock.External.Entity.Identity
 {
     [Table("MUserLoginAttempts")]
     public class MUserLoginAttempt : MEntity

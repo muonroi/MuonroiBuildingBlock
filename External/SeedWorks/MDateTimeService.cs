@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.SeedWorks
+﻿namespace Muonroi.BuildingBlock.External.SeedWorks
 {
     internal class MDateTimeService : IMDateTimeService
     {

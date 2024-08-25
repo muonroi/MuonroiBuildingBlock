@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Controller
+﻿namespace Muonroi.BuildingBlock.External.Controller
 {
     public class MControllerBase(IMediator mediator) : ControllerBase
     {

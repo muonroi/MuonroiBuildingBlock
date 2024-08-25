@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.Internal.Startup.Configurations
+﻿namespace Muonroi.BuildingBlock.Internal.Startup.Configurations
 {
     internal class APIVersionErrorResponseProvider : IErrorResponseProvider
     {

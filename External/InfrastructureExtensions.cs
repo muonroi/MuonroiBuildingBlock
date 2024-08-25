@@ -1,8 +1,8 @@
-﻿namespace MBuildingBlock.External
+﻿namespace Muonroi.BuildingBlock.External
 {
     public static class InfrastructureExtensions
     {
-        public static readonly Assembly? entryAsembly = Assembly.GetEntryAssembly();
+        public static readonly Assembly? entryAssembly = Assembly.GetEntryAssembly();
 
         public static IServiceCollection AddInfrastructure(this IServiceCollection services,
             IConfiguration configuration,
@@ -32,8 +32,7 @@
             _ = builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
             _ = builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
             {
-                _ = builder.RegisterModule(new MediatorModule());
-                _ = builder.RegisterModule(new AuthContextModule());
+                _ = builder.ResolveDependencyContainer();
             });
             return builder;
         }

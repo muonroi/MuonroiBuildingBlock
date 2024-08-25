@@ -1,8 +1,8 @@
-﻿namespace MBuildingBlock.External.SeedWorks
+﻿namespace Muonroi.BuildingBlock.External.SeedWorks
 {
     public class MRepository<T> : IMRepository<T> where T : MEntity
     {
-        private readonly MAuthInfoContext _authContext;
+        private readonly MAuthenticateInfoContext _authContext;
         protected readonly MDbContext _dbBaseContext;
         protected readonly DbSet<T> _dbSet;
 
@@ -11,7 +11,7 @@
         public IMUnitOfWork UnitOfWork => _dbBaseContext;
         protected IQueryable<T> Queryable => _dbSet.Where(m => !m.IsDeleted);
 
-        public MRepository(MDbContext dbContext, MAuthInfoContext authContext)
+        public MRepository(MDbContext dbContext, MAuthenticateInfoContext authContext)
         {
             _authContext = authContext ?? throw new ArgumentNullException(nameof(authContext));
             _dbBaseContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));

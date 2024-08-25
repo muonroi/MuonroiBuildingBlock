@@ -1,8 +1,8 @@
-﻿namespace MBuildingBlock.External.BearerToken
+﻿namespace Muonroi.BuildingBlock.External.BearerToken
 {
-    public static class MJwtTokenHelper
+    public static class MAuthenticateTokenHelper
     {
-        public static string GenerateJwtToken(MTokenInfo jwtConfig, MUserModel user, DateTime? expiresTime)
+        public static string GenerateAuthenticateToken(MTokenInfo tokenConfig, MUserModel user, DateTime? expiresTime)
         {
             try
             {
@@ -11,8 +11,8 @@
                     new Claim("user_id", user.UserId),
                     new Claim("user_guid", user.UserGuid),
                     new Claim("username", user.Username),
-                    new Claim(JwtRegisteredClaimNames.Iss, jwtConfig.Issuer),
-                    new Claim(JwtRegisteredClaimNames.Aud, jwtConfig.Audience),
+                    new Claim(JwtRegisteredClaimNames.Iss, tokenConfig.Issuer),
+                    new Claim(JwtRegisteredClaimNames.Aud, tokenConfig.Audience),
                 ];
                 foreach (string role in user.Roles)
                 {
@@ -20,22 +20,22 @@
                 }
 
                 RSA rsa = RSA.Create();
-                rsa.ImportFromPem(jwtConfig.PrivateKey.ToCharArray());
+                rsa.ImportFromPem(tokenConfig.PrivateKey.ToCharArray());
 
                 RsaSecurityKey signingKey = new(rsa);
                 SigningCredentials credentials = new(signingKey, SecurityAlgorithms.RsaSha256);
 
                 SecurityTokenDescriptor tokenDescriptor = new()
                 {
-                    Issuer = jwtConfig.Issuer,
-                    Audience = jwtConfig.Audience,
+                    Issuer = tokenConfig.Issuer,
+                    Audience = tokenConfig.Audience,
                     Claims = new Dictionary<string, object>
                     {
                         { "user_id", user.UserId },
                         { "user_guid", user.UserGuid },
                         { "username", user.Username }
                     },
-                    Expires = expiresTime ?? DateTime.UtcNow.AddMinutes(jwtConfig.ExpiryMinutes),
+                    Expires = expiresTime ?? DateTime.UtcNow.AddMinutes(tokenConfig.ExpiryMinutes),
                     SigningCredentials = credentials
                 };
 

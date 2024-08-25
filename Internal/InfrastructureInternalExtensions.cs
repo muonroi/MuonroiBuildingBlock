@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.Internal
+﻿namespace Muonroi.BuildingBlock.Internal
 {
     internal static class InfrastructureInternalExtensions
     {
@@ -23,7 +23,7 @@
                 ValidateIssuer = false,
                 ValidateAudience = false,
                 ValidateLifetime = true,
-                ValidateIssuerSigningKey = true, // Đặt là true để validate khóa
+                ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new RsaSecurityKey(rsa),
                 ClockSkew = TimeSpan.Zero
             };
@@ -40,6 +40,13 @@
             _ = services.AddAuthorization();
 
             return services;
+        }
+
+        internal static ContainerBuilder ResolveDependencyContainer(this ContainerBuilder builder)
+        {
+            _ = builder.RegisterModule(new MediatorModule());
+            _ = builder.RegisterModule(new AuthContextModule());
+            return builder;
         }
     }
 }

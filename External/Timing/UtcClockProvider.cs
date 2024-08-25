@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Timing
+﻿namespace Muonroi.BuildingBlock.External.Timing
 {
     /// <summary>
     /// Implements <see cref="IClockProvider"/> to work with UTC times.

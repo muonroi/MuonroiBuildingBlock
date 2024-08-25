@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Response
+﻿namespace Muonroi.BuildingBlock.External.Response
 {
     public class MResponse<T> : MVoidMethodResult
     {

@@ -1,4 +1,6 @@
-﻿namespace MBuildingBlock.External.Entity.Identity
+﻿using Muonroi.BuildingBlock.External.Entity;
+
+namespace Muonroi.BuildingBlock.External.Entity.Identity
 {
     [Table("MPermissions")]
     public class MPermission : MEntity

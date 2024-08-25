@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Interfaces;
+﻿namespace Muonroi.BuildingBlock.External.Interfaces;
 
 public interface IMQueries<T> where T : MEntity
 {

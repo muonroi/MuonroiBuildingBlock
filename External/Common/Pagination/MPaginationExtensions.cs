@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Common.Pagination
+﻿namespace Muonroi.BuildingBlock.External.Common.Pagination
 {
     public static class MPaginationExtensions
     {

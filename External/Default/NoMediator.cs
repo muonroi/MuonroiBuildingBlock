@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Default
+﻿namespace Muonroi.BuildingBlock.External.Default
 {
     public class NoMediator : IMediator
     {

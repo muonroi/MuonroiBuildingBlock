@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.Contract.Interfaces
+﻿namespace Muonroi.BuildingBlock.Contract.Interfaces
 {
     internal interface IGuidGenerator
     {

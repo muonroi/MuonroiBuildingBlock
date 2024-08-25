@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.JsonConverter
+﻿namespace Muonroi.BuildingBlock.External.JsonConverter
 {
     public class MDateTimeConverter
    : JsonConverter<DateTime>

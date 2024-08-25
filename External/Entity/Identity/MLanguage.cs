@@ -1,4 +1,7 @@
-﻿namespace MBuildingBlock.External.Entity.Identity
+﻿using Muonroi.BuildingBlock.External.Entity;
+using Muonroi.BuildingBlock.External.Models;
+
+namespace Muonroi.BuildingBlock.External.Entity.Identity
 {
     [Table("MLanguages")]
     public class MLanguage : MEntity

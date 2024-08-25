@@ -1,10 +1,10 @@
-﻿namespace MBuildingBlock.External.DI
+﻿namespace Muonroi.BuildingBlock.External.DI
 {
-    public static class ConfigurationDepedencyInjection
+    public static class ConfigurationDependencyInjection
     {
         public static IServiceCollection AddScopeServices(this IServiceCollection services, Assembly assembly)
         {
-            return services.ResolveDepedencyScope(assembly);
+            return services.ResolveDependencyScope(assembly);
         }
     }
 }

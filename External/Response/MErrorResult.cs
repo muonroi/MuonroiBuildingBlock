@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Response
+﻿namespace Muonroi.BuildingBlock.External.Response
 {
     [NotMapped]
     public class MErrorResult

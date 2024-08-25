@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Entity.EFConfig
+﻿namespace Muonroi.BuildingBlock.External.Entity.EFConfig
 {
     public class MUserConfiguration : IEntityTypeConfiguration<MUser>
     {

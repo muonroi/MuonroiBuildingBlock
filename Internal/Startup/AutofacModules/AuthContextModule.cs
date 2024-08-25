@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.Internal.Startup.AutofacModules
+﻿namespace Muonroi.BuildingBlock.Internal.Startup.AutofacModules
 {
     internal class AuthContextModule : Module
     {
@@ -8,21 +8,21 @@
 
             _ = builder.Register(delegate (IComponentContext context)
             {
-                ILogger<AuthHeaderHandler> logger = context.Resolve<ILogger<AuthHeaderHandler>>();
+                ILogger<AuthenticateHeaderHandler> logger = context.Resolve<ILogger<AuthenticateHeaderHandler>>();
                 IConfiguration configuration = context.Resolve<IConfiguration>();
-                MAuthInfoContext authContext = context.Resolve<MAuthInfoContext>();
-                return new AuthHeaderHandler(logger, authContext, configuration);
+                MAuthenticateInfoContext authContext = context.Resolve<MAuthenticateInfoContext>();
+                return new AuthenticateHeaderHandler(logger, authContext, configuration);
             }).InstancePerLifetimeScope();
 
             _ = builder.Register(delegate (IComponentContext context)
             {
-                ILogger<MAuthInfoContext> logger = context.Resolve<ILogger<MAuthInfoContext>>();
+                ILogger<MAuthenticateInfoContext> logger = context.Resolve<ILogger<MAuthenticateInfoContext>>();
                 ResourceSetting resourceSetting = context.Resolve<ResourceSetting>();
                 IHttpContextAccessor httpContextAccessor = context.Resolve<IHttpContextAccessor>();
-                MAuthInfoContext authContext;
+                MAuthenticateInfoContext authContext;
                 if (httpContextAccessor?.HttpContext != null)
                 {
-                    authContext = new MAuthInfoContext(httpContextAccessor, resourceSetting);
+                    authContext = new MAuthenticateInfoContext(httpContextAccessor, resourceSetting);
                     logger.LogTrace("Init AuthContext by IHttpContextAccessor: {AuthContext}", authContext);
                 }
                 else
@@ -31,12 +31,12 @@
 
                     if (amqpContext != null)
                     {
-                        authContext = new MAuthInfoContext(amqpContext);
+                        authContext = new MAuthenticateInfoContext(amqpContext);
                         logger.LogInformation("Init AuthContext by IAmqpContext: {AuthContext}", authContext);
                     }
                     else
                     {
-                        authContext = new MAuthInfoContext();
+                        authContext = new MAuthenticateInfoContext();
                         logger.LogWarning("Failed to initialize AuthContext by IAmqpContext. Using default constructor.");
                     }
                 }

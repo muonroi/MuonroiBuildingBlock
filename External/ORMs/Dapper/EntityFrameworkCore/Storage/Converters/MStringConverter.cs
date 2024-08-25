@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.ORMs.Dapper.EntityFrameworkCore.Storage.Converters;
+﻿namespace Muonroi.BuildingBlock.External.ORMs.Dapper.EntityFrameworkCore.Storage.Converters;
 
 public class MStringConverter : ValueConverter<string, string>
 {

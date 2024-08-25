@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Timing
+﻿namespace Muonroi.BuildingBlock.External.Timing
 {
     /// <summary>
     /// Used to perform some common date-time operations.

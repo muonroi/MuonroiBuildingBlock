@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External
+﻿namespace Muonroi.BuildingBlock.External
 {
     public static class ApplicationExtensions
     {

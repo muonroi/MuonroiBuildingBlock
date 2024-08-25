@@ -1,8 +1,8 @@
-﻿namespace MBuildingBlock.External
+﻿namespace Muonroi.BuildingBlock.External
 {
-    public partial class MAuthInfoContext
+    public partial class MAuthenticateInfoContext
     {
-        public MAuthInfoContext(int currentUserId, string currentUserGuid, string currentUsername, string accessToken, string apiKey)
+        public MAuthenticateInfoContext(int currentUserId, string currentUserGuid, string currentUsername, string accessToken, string apiKey)
         {
             CurrentUserId = currentUserId;
             CurrentUserGuid = currentUserGuid;
@@ -25,7 +25,7 @@
             }
         }
 
-        internal MAuthInfoContext(IHttpContextAccessor httpContextAccessor, ResourceSetting resourceSetting)
+        internal MAuthenticateInfoContext(IHttpContextAccessor httpContextAccessor, ResourceSetting resourceSetting)
         {
             string authorizationHeader = "Authorization";
             string? token = httpContextAccessor.HttpContext?.Request.Headers[authorizationHeader];
@@ -53,7 +53,7 @@
             ApiKey = httpContextAccessor.HttpContext?.Request.Headers["ApiKey"]!;
         }
 
-        internal MAuthInfoContext(IAmqpContext amqpContext)
+        internal MAuthenticateInfoContext(IAmqpContext amqpContext)
         {
             _ = int.TryParse(amqpContext.GetHeaderByKey("user_id"), out int result);
             CurrentUserId = result;

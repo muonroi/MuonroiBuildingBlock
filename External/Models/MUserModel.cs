@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Models
+﻿namespace Muonroi.BuildingBlock.External.Models
 {
     public class MUserModel(string userId, string userGuid, string username, IEnumerable<string> roles)
     {

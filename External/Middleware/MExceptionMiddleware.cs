@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Midleware;
+﻿namespace Muonroi.BuildingBlock.External.Middleware;
 
 public class MExceptionMiddleware(RequestDelegate next, ISerilogLogger logger, IMJsonSerializeService serializeService)
 {

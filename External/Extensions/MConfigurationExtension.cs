@@ -1,4 +1,4 @@
-﻿namespace MBuildingBlock.External.Extentions;
+﻿namespace Muonroi.BuildingBlock.External.Extensions;
 
 public static class MConfigurationExtension
 {
@@ -33,7 +33,7 @@ public static class MConfigurationExtension
         string? cipherText = configuration.GetCryptConfigValue(configKey);
         ArgumentException.ThrowIfNullOrEmpty(cipherText);
 
-        string planText = MCryptographyExtention.Decrypt(secretKey, cipherText);
+        string planText = MCryptographyExtension.Decrypt(secretKey, cipherText);
         ArgumentException.ThrowIfNullOrEmpty(planText);
 
         return planText;
@@ -64,7 +64,7 @@ public static class MConfigurationExtension
         string? cipherText = configuration.GetCryptConfigValue(configKey);
         ArgumentException.ThrowIfNullOrEmpty(cipherText);
 
-        string planText = MCryptographyExtention.Decrypt(secretKey, cipherText);
+        string planText = MCryptographyExtension.Decrypt(secretKey, cipherText);
 
         return planText;
     }
@@ -76,7 +76,7 @@ public static class MConfigurationExtension
         string secretKey = configuration.GetCryptConfigValue(ConfigKey) ?? string.Empty;
         ArgumentException.ThrowIfNullOrEmpty(secretKey);
 
-        string planText = MCryptographyExtention.Decrypt(secretKey, cipherText);
+        string planText = MCryptographyExtension.Decrypt(secretKey, cipherText);
 
         return planText;
     }
