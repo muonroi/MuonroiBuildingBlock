@@ -2,14 +2,19 @@
 {
     internal static class InfrastructureInternalExtensions
     {
-        internal static IServiceCollection ResolveBearerToken<T>(this IServiceCollection services)
+        internal static IServiceCollection ResolveBearerToken<T>(this IServiceCollection services, string policyUrl = "policy.html")
             where T : MTokenInfo
         {
             ServiceProvider serviceProvider = services.BuildServiceProvider();
             T jwtConfig = serviceProvider.GetRequiredService<T>();
-            _ = services.AddApiVersioning(delegate (ApiVersioningOptions opt)
+            _ = services.AddApiVersioning(delegate (ApiVersioningOptions options)
             {
-                opt.ErrorResponses = new APIVersionErrorResponseProvider();
+                options.ReportApiVersions = true;
+                _ = options.Policies.Sunset(0.9)
+                .Effective(DateTimeOffset.Now.AddDays(60))
+                .Link(policyUrl)
+                    .Title("Versioning Policy")
+                    .Type("text/html");
             });
             IdentityModelEventSource.ShowPII = true;
             RSA rsa = RSA.Create();

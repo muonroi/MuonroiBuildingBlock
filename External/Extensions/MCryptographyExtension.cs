@@ -2,35 +2,6 @@
 
 public static class MCryptographyExtension
 {
-    public static string Encrypt(string key, string plainText)
-    {
-        if (string.IsNullOrEmpty(plainText) || string.IsNullOrEmpty(key))
-        {
-            throw new ArgumentException("Key and plainText must not be null or empty.");
-        }
-
-        byte[] cipher;
-        using (Aes aesAlg = Aes.Create())
-        {
-            aesAlg.Padding = PaddingMode.PKCS7;
-            aesAlg.KeySize = 256;
-            aesAlg.Key = GetValidKey(key, aesAlg.KeySize);
-            aesAlg.IV = new byte[16]; // Sử dụng IV cố định
-
-            ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-
-            using MemoryStream msEncrypt = new();
-            using CryptoStream csEncrypt = new(msEncrypt, encryptor, CryptoStreamMode.Write);
-            using (StreamWriter swEncrypt = new(csEncrypt))
-            {
-                swEncrypt.Write(plainText);
-            }
-            cipher = msEncrypt.ToArray();
-        }
-
-        return Convert.ToBase64String(cipher);
-    }
-
     public static string Decrypt(string key, string cipherText)
     {
         if (string.IsNullOrEmpty(cipherText) || string.IsNullOrEmpty(key))
@@ -38,10 +9,10 @@ public static class MCryptographyExtension
             throw new ArgumentException("Key and cipherText must not be null or empty.");
         }
 
-        byte[] buffer = Convert.FromBase64String(cipherText);
-        byte[] iv = new byte[16]; // Sử dụng cùng một IV cố định
+        byte[] buffer = global::System.Convert.FromBase64String(cipherText);
+        byte[] iv = new byte[16];
 
-        byte[] keyBytes = GetValidKey(key, 256); // Sử dụng hàm băm để chuyển đổi key thành key có kích thước 256-bit (AES-256)
+        byte[] keyBytes = GetValidKey(key, 256);
 
         using Aes aesAlg = Aes.Create();
         aesAlg.Padding = PaddingMode.PKCS7;
@@ -99,7 +70,7 @@ public static class MCryptographyExtension
     {
         byte[] byteValues = Encoding.Unicode.GetBytes(text);
         byte[] byteHash = MD5.HashData(byteValues);
-        return Convert.ToBase64String(byteHash);
+        return global::System.Convert.ToBase64String(byteHash);
     }
 
     public static string Sha256(string value)

@@ -12,6 +12,38 @@
         }
 
         /// <summary>
+        /// Converts the input string to a Base64-encoded string.
+        /// </summary>
+        /// <param name="plainText">The string to be encoded.</param>
+        /// <returns>A Base64-encoded string.</returns>
+        public static string ToBase64String(this string plainText)
+        {
+            if (string.IsNullOrEmpty(plainText))
+            {
+                return string.Empty;
+            }
+
+            byte[] plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+            return System.Convert.ToBase64String(plainTextBytes);
+        }
+
+        /// <summary>
+        /// Converts a Base64-encoded string back to a regular string.
+        /// </summary>
+        /// <param name="base64EncodedData">The Base64-encoded string.</param>
+        /// <returns>The decoded regular string.</returns>
+        public static string FromBase64String(this string base64EncodedData)
+        {
+            if (string.IsNullOrEmpty(base64EncodedData))
+            {
+                return string.Empty;
+            }
+
+            byte[] base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
+            return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+        }
+
+        /// <summary>
         /// Gets a substring of a string from beginning of the string.
         /// </summary>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="str"/> is null</exception>

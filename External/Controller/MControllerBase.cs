@@ -1,7 +1,8 @@
 ﻿namespace Muonroi.BuildingBlock.External.Controller
 {
-    public class MControllerBase(IMediator mediator) : ControllerBase
+    public abstract class MControllerBase(IMediator mediator, ILogger logger) : ControllerBase
     {
-        protected IMediator Mediator => mediator;
+        protected IMediator Mediator { get; } = mediator;
+        protected ILogger Logger { get; } = logger;
     }
 }

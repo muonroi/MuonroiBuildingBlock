@@ -2,9 +2,16 @@
 
 public static class MSerilogAction
 {
-    public static Action<HostBuilderContext, LoggerConfiguration> Configure => (context, configuration) =>
+    public static Action<HostBuilderContext, IServiceProvider, LoggerConfiguration, bool> Configure => (context, services, configuration, enableSelfLog) =>
     {
         _ = configuration
-            .ReadFrom.Configuration(context.Configuration);
+             .ReadFrom.Configuration(context.Configuration)
+             .ReadFrom.Services(services)
+             .Enrich.FromLogContext();
+
+        if (enableSelfLog)
+        {
+            SelfLog.Enable(msg => Console.Error.WriteLine(msg));
+        }
     };
 }

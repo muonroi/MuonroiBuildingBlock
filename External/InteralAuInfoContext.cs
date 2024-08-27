@@ -97,7 +97,7 @@
                 string value = claims.First((c) => c.Type == claimType).Value;
                 if (!string.IsNullOrEmpty(value))
                 {
-                    return (T)Convert.ChangeType(value, typeof(T));
+                    return (T)global::System.Convert.ChangeType(value, typeof(T));
                 }
             }
             return default;

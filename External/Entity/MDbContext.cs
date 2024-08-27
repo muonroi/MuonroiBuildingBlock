@@ -1,6 +1,4 @@
-﻿using Muonroi.BuildingBlock.External.Entity.EFConfig;
-
-namespace Muonroi.BuildingBlock.External.Entity
+﻿namespace Muonroi.BuildingBlock.External.Entity
 {
     public class MDbContext : DbContext, IMUnitOfWork, IDisposable, IIdentityAuth
     {

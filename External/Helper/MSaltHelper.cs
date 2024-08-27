@@ -10,7 +10,7 @@
             {
                 csprng.GetBytes(salt);
             }
-            return Convert.ToBase64String(salt);
+            return global::System.Convert.ToBase64String(salt);
         }
     }
 }

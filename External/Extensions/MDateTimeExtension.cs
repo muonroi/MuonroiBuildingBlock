@@ -16,7 +16,7 @@
         public static DateTime TimeStampToDateTime(this double timeStamp)
         {
             timeStamp = timeStamp < 0.0 ? 0.0 : timeStamp;
-            return DateTimeOffset.FromUnixTimeSeconds(Convert.ToInt64(timeStamp)).DateTime;
+            return DateTimeOffset.FromUnixTimeSeconds(global::System.Convert.ToInt64(timeStamp)).DateTime;
         }
 
         public static double GetTimeStamp(this DateTime dateTime, bool includedTimeValue = false)
@@ -37,7 +37,7 @@
 
         public static bool GreaterThanWithoutDay(this DateTime dtFrom, DateTime dtTo)
         {
-            return dtFrom.Year > dtTo.Year || dtFrom.Year == dtTo.Year && dtFrom.Month > dtTo.Month;
+            return dtFrom.Year > dtTo.Year || (dtFrom.Year == dtTo.Year && dtFrom.Month > dtTo.Month);
         }
 
         public static int ConverTimestampToYearMonth(this double timeStamp)
