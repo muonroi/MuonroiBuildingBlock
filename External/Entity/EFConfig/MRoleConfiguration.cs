@@ -5,7 +5,7 @@
         public void Configure(EntityTypeBuilder<MRole> builder)
         {
             _ = builder.HasIndex(b => b.Name)
-                .HasDatabaseName("IX_Name")
+                .HasDatabaseName("IX_MRoles_Name")
                 .IsUnique();
         }
     }

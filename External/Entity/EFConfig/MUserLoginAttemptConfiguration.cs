@@ -4,7 +4,7 @@
     {
         public void Configure(EntityTypeBuilder<MUserLoginAttempt> builder)
         {
-            _ = builder.HasIndex(b => b.UserNameOrEmailAddress).HasDatabaseName("IX_UserNameOrEmailAddress").IsUnique(false);
+            _ = builder.HasIndex(b => b.UserNameOrEmailAddress).HasDatabaseName("IX_MUserLoginAttempt_UserNameOrEmailAddress").IsUnique(false);
         }
     }
 }

@@ -4,7 +4,7 @@
     {
         public void Configure(EntityTypeBuilder<MUserToken> builder)
         {
-            _ = builder.HasIndex(b => b.LoginProvider).HasDatabaseName("IX_LoginProvider").IsUnique(false);
+            _ = builder.HasIndex(b => b.LoginProvider).HasDatabaseName("IX_MUserToken_LoginProvider").IsUnique(false);
         }
     }
 }

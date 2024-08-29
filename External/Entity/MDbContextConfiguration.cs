@@ -4,32 +4,46 @@
     {
         public static IServiceCollection AddDbContextConfigure<T>(
             this IServiceCollection services,
-            IConfiguration configuration,
-            string connectName = "DefaultConnection",
-            string dbType = nameof(DbTypes.SqlServer))
+            IConfiguration configuration)
             where T : MDbContext
         {
-            string? connectionString = configuration.GetConnectionString(connectName);
-            if (string.IsNullOrEmpty(connectionString))
+            DatabaseConfigs? databaseConfigs = configuration.GetSection(nameof(DatabaseConfigs)).Get<DatabaseConfigs>();
+            if (databaseConfigs == null || string.IsNullOrEmpty(databaseConfigs.DbType))
             {
-                throw new ArgumentNullException(nameof(connectName), $"Connection string '{connectName}' is not configured.");
+                throw new InvalidDataException("Database configuration is not properly set.");
             }
 
-            _ = dbType switch
+            if (databaseConfigs.DbType == nameof(DbTypes.MongoDb))
             {
-                nameof(DbTypes.SqlServer) => services.AddSingleton(typeof(IDbContextConfigurer<T>), typeof(SqlServerDbContextConfigurer<T>)),
-                nameof(DbTypes.MySql) => services.AddSingleton(typeof(IDbContextConfigurer<T>), typeof(MySqlDbContextConfigurer<T>)),
-                nameof(DbTypes.PostgreSql) => services.AddSingleton(typeof(IDbContextConfigurer<T>), typeof(PostgreSqlDbContextConfigurer<T>)),
-                nameof(DbTypes.Sqlite) => services.AddSingleton(typeof(IDbContextConfigurer<T>), typeof(SqliteDbContextConfigurer<T>)),
-                nameof(DbTypes.MongoDb) => throw new ArgumentException("MongoDB does not support DbContextFactory directly."),
-                _ => throw new ArgumentException("Unsupported database type: " + dbType),
-            };
+                MongoDbContextConfigurer<T> mongoConfigurer = new();
+                _ = mongoConfigurer.ConfigureMongoDb(services, configuration);
+            }
+            else
+            {
+                string connectionString = databaseConfigs.DbType switch
+                {
+                    nameof(DbTypes.SqlServer) => databaseConfigs.ConnectionStrings?.SqlServerConnectionString,
+                    nameof(DbTypes.MySql) => databaseConfigs.ConnectionStrings?.MySqlConnectionString,
+                    nameof(DbTypes.PostgreSql) => databaseConfigs.ConnectionStrings?.PostgreSqlConnectionString,
+                    nameof(DbTypes.Sqlite) => databaseConfigs.ConnectionStrings?.SqliteConnectionString,
+                    _ => throw new ArgumentException("Unsupported database type: " + databaseConfigs.DbType),
+                } ?? throw new InvalidDataException("Connection string is not provided or is empty.");
 
-            _ = services.AddDbContext<T>((serviceProvider, options) =>
-            {
-                IDbContextConfigurer<T> configurer = serviceProvider.GetRequiredService<IDbContextConfigurer<T>>();
-                configurer.Configure((DbContextOptionsBuilder<T>)options, connectionString);
-            });
+                _ = databaseConfigs.DbType switch
+                {
+                    nameof(DbTypes.SqlServer) => services.AddSingleton(typeof(IDbContextConfigurer<T>), typeof(SqlServerDbContextConfigurer<T>)),
+                    nameof(DbTypes.MySql) => services.AddSingleton(typeof(IDbContextConfigurer<T>), typeof(MySqlDbContextConfigurer<T>)),
+                    nameof(DbTypes.PostgreSql) => services.AddSingleton(typeof(IDbContextConfigurer<T>), typeof(PostgreSqlDbContextConfigurer<T>)),
+                    nameof(DbTypes.Sqlite) => services.AddSingleton(typeof(IDbContextConfigurer<T>), typeof(SqliteDbContextConfigurer<T>)),
+                    _ => throw new ArgumentException("Unsupported database type: " + databaseConfigs.DbType),
+                };
+
+                _ = services.AddDbContext<T>((serviceProvider, options) =>
+                {
+                    IDbContextConfigurer<T> configurer = serviceProvider.GetRequiredService<IDbContextConfigurer<T>>();
+                    configurer.Configure((DbContextOptionsBuilder<T>)options, connectionString);
+                });
+            }
 
             return services;
         }

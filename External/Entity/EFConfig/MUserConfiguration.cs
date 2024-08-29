@@ -5,7 +5,7 @@
         public void Configure(EntityTypeBuilder<MUser> builder)
         {
             _ = builder.HasIndex(b => b.UserName)
-                .HasDatabaseName("IX_UserName").IsUnique();
+                .HasDatabaseName("IX_MUser_UserName").IsUnique();
         }
     }
 }

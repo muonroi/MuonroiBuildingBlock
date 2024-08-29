@@ -2,7 +2,7 @@
 {
     public static class MAuthenticateTokenHelper
     {
-        public static string GenerateAuthenticateToken(MTokenInfo tokenConfig, MUserModel user, DateTime? expiresTime)
+        public static string GenerateAuthenticateToken(MTokenInfo tokenConfig, MUserModel user, DateTime? expiresTime = null)
         {
             try
             {
@@ -14,12 +14,14 @@
                     new Claim(JwtRegisteredClaimNames.Iss, tokenConfig.Issuer),
                     new Claim(JwtRegisteredClaimNames.Aud, tokenConfig.Audience),
                 ];
+
+                // Add roles to claims
                 foreach (string role in user.Roles)
                 {
                     claims.Add(new Claim(ClaimTypes.Role, role));
                 }
 
-                RSA rsa = RSA.Create();
+                using RSA rsa = RSA.Create();
                 rsa.ImportFromPem(tokenConfig.PrivateKey.ToCharArray());
 
                 RsaSecurityKey signingKey = new(rsa);
@@ -29,21 +31,14 @@
                 {
                     Issuer = tokenConfig.Issuer,
                     Audience = tokenConfig.Audience,
-                    Claims = new Dictionary<string, object>
-                    {
-                        { "user_id", user.UserId },
-                        { "user_guid", user.UserGuid },
-                        { "username", user.Username }
-                    },
+                    Subject = new ClaimsIdentity(claims),
                     Expires = expiresTime ?? DateTime.UtcNow.AddMinutes(tokenConfig.ExpiryMinutes),
                     SigningCredentials = credentials
                 };
 
                 JwtSecurityTokenHandler tokenHandler = new();
                 SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-                string resultToken = tokenHandler.WriteToken(token);
-
-                return resultToken;
+                return tokenHandler.WriteToken(token);
             }
             catch (Exception ex)
             {

@@ -3,7 +3,7 @@
     public static class MigrationManager
     {
         public static WebApplication MigrateDatabase<TContext>(this WebApplication app)
-            where TContext : MDbContext, new()
+            where TContext : MDbContext
         {
             using (IServiceScope scope = app.Services.CreateScope())
             {

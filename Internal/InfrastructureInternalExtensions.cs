@@ -5,24 +5,32 @@
         internal static IServiceCollection ResolveBearerToken<T>(this IServiceCollection services, string policyUrl = "policy.html")
             where T : MTokenInfo
         {
-            ServiceProvider serviceProvider = services.BuildServiceProvider();
+            // Build the service provider to resolve dependencies
+            using ServiceProvider serviceProvider = services.BuildServiceProvider();
             T jwtConfig = serviceProvider.GetRequiredService<T>();
-            _ = services.AddApiVersioning(delegate (ApiVersioningOptions options)
-            {
-                options.ReportApiVersions = true;
-                _ = options.Policies.Sunset(0.9)
-                .Effective(DateTimeOffset.Now.AddDays(60))
-                .Link(policyUrl)
-                    .Title("Versioning Policy")
-                    .Type("text/html");
-            });
-            IdentityModelEventSource.ShowPII = true;
-            RSA rsa = RSA.Create();
+
             if (string.IsNullOrEmpty(jwtConfig.SigningKeys))
             {
                 throw new Exception("SecretKey is null or empty");
             }
+
+            // Configure API versioning with sunset policy
+            _ = services.AddApiVersioning(options =>
+            {
+                options.ReportApiVersions = true;
+                _ = options.Policies.Sunset(0.9)
+                    .Effective(DateTimeOffset.Now.AddDays(60))
+                    .Link(policyUrl)
+                    .Title("Versioning Policy")
+                    .Type("text/html");
+            });
+
+            IdentityModelEventSource.ShowPII = true;
+
+            // Configure RSA for JWT token validation
+            RSA rsa = RSA.Create();
             rsa.ImportFromPem(jwtConfig.PublicKey.ToCharArray());
+
             TokenValidationParameters validationParameters = new()
             {
                 ValidateIssuer = false,
@@ -32,16 +40,19 @@
                 IssuerSigningKey = new RsaSecurityKey(rsa),
                 ClockSkew = TimeSpan.Zero
             };
-            _ = services.AddAuthentication(delegate (AuthenticationOptions x)
+
+            // Configure JWT Bearer authentication
+            _ = services.AddAuthentication(options =>
             {
-                x.DefaultAuthenticateScheme = "Bearer";
-                x.DefaultChallengeScheme = "Bearer";
-            }).AddJwtBearer(delegate (JwtBearerOptions x)
+                options.DefaultAuthenticateScheme = "Bearer";
+                options.DefaultChallengeScheme = "Bearer";
+            }).AddJwtBearer(options =>
             {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = validationParameters;
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = validationParameters;
             });
+
             _ = services.AddAuthorization();
 
             return services;
@@ -49,6 +60,7 @@
 
         internal static ContainerBuilder ResolveDependencyContainer(this ContainerBuilder builder)
         {
+            // Register application modules to Autofac container
             _ = builder.RegisterModule(new MediatorModule());
             _ = builder.RegisterModule(new AuthContextModule());
             return builder;
