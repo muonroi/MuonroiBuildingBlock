@@ -48,7 +48,7 @@
             {
                 DateTime utcNow = DateTime.UtcNow;
                 newEntity.CreatedDateTS = utcNow.GetTimeStamp(true);
-                newEntity.UpdatedDateTS = utcNow.GetTimeStamp(true);
+                newEntity.LastModificationTimeTs = utcNow.GetTimeStamp(true);
                 newEntity.CreatedUserId = _authContext?.CurrentUserId;
                 newEntity.CreatedUserName = _authContext?.CurrentUsername;
                 newEntity.EntityId = Guid.NewGuid();
@@ -108,7 +108,7 @@
         {
             try
             {
-                updateEntity.UpdatedDateTS = DateTime.UtcNow.GetTimeStamp(true);
+                updateEntity.LastModificationTimeTs = DateTime.UtcNow.GetTimeStamp(true);
                 updateEntity.UpdatedUserId = _authContext?.CurrentUserId;
                 updateEntity.UpdatedUserName = _authContext?.CurrentUsername;
                 updateEntity.AddDomainEvent(new MEntityChangedEvent<T>(updateEntity));

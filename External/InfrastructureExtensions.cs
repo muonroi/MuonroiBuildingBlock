@@ -4,40 +4,90 @@
     {
         public static readonly Assembly? EntryAssembly = Assembly.GetEntryAssembly();
 
-        public static IServiceCollection AddInfrastructure<TProgram>(this IServiceCollection services,
-            IConfiguration configuration,
-            MTokenInfo? tokenConfig = null,
-            MPaginationConfig? paginationConfigs = null)
+        public static IServiceCollection AddInfrastructure<TProgram>(
+                this IServiceCollection services,
+                IConfiguration configuration,
+                MTokenInfo? tokenConfig = null,
+                MPaginationConfig? paginationConfigs = null,
+                bool isSecrectDefault = true,
+                string serectKey = "")
         {
-            // Add essential services to the DI container
+            _ = services.AddControllersWithOptions()
+                    .AddApiDocumentation<TProgram>()
+                    .AddCoreServices(configuration, isSecrectDefault, serectKey, paginationConfigs, tokenConfig)
+                    .AddAuthContext();
+
+            using ServiceProvider serviceProvider = services.BuildServiceProvider();
+            RedisConfigs redisConfigs = serviceProvider.GetRequiredService<RedisConfigs>();
+            _ = services.AddRedis(configuration, redisConfigs)
+                    .AddDapperCaching(configuration, redisConfigs);
+
+            return services;
+        }
+
+        private static IServiceCollection AddControllersWithOptions(this IServiceCollection services)
+        {
             _ = services.AddControllers(options =>
             {
                 _ = options.Filters.Add<DefaultProducesResponseTypeFilter>();
             })
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                })
-                .AddControllersAsServices();
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            })
+            .AddControllersAsServices();
 
-            // Register various services for API endpoints and utilities
+            return services;
+        }
+
+        private static IServiceCollection AddApiDocumentation<TProgram>(this IServiceCollection services)
+        {
             _ = services.AddEndpointsApiExplorer()
-                    .AddSwaggerGen(options =>
-                    {
-                        options.OperationFilter<SwaggerDefaultValues>();
-                        string fileName = typeof(TProgram).Assembly.GetName().Name + ".xml";
-                        string filePath = Path.Combine(AppContext.BaseDirectory, fileName);
-                        options.IncludeXmlComments(filePath);
-                    })
-                    .AddHttpContextAccessor()
-                    .AddProblemDetails()
-                    .AddSingleton<IMJsonSerializeService, MJsonSerializeService>()
-                    .AddSingleton<IMDateTimeService, MDateTimeService>()
-                    .AddPaginationConfigs(configuration, paginationConfigs)
-                    .AddJwtConfigs(configuration, tokenConfig)
-                    .AddSystemConfig(configuration)
-                    .AddAuthContext();
+                .AddSwaggerGen(options =>
+                {
+                    options.OperationFilter<SwaggerDefaultValues>();
+                    string fileName = typeof(TProgram).Assembly.GetName().Name + ".xml";
+                    string filePath = Path.Combine(AppContext.BaseDirectory, fileName);
+                    options.IncludeXmlComments(filePath);
+                });
 
+            return services;
+        }
+
+        private static IServiceCollection AddCoreServices(
+            this IServiceCollection services,
+            IConfiguration configuration,
+            bool isSecrectDefault,
+            string serectKey,
+            MPaginationConfig? paginationConfigs,
+            MTokenInfo? tokenConfig)
+        {
+            _ = services.AddHttpContextAccessor()
+                .AddProblemDetails()
+                .AddSingleton<IMJsonSerializeService, MJsonSerializeService>()
+                .AddSingleton<IMDateTimeService, MDateTimeService>()
+                .AddSingleton<ICacheProvider, RedisCacheProvider>()
+                .AddRedisConfiguration(configuration, isSecrectDefault, serectKey)
+                .AddPaginationConfigs(configuration, paginationConfigs)
+                .AddJwtConfigs(configuration, tokenConfig)
+                .AddSystemConfig(configuration);
+
+            return services;
+        }
+
+        public static IServiceCollection AddRedisConfiguration(this IServiceCollection services, IConfiguration configuration,
+    bool isSecrectDefault = true,
+    string serectKey = "")
+        {
+            RedisConfigs redisConfigs = new();
+            configuration.GetSection(redisConfigs.SectionName).Bind(redisConfigs);
+
+            redisConfigs.Host = MStringExtention.DecryptConfigurationValue(configuration, redisConfigs.Host, isSecrectDefault, serectKey) ?? throw new InvalidDataException();
+            redisConfigs.Port = MStringExtention.DecryptConfigurationValue(configuration, redisConfigs.Port, isSecrectDefault, serectKey) ?? throw new InvalidDataException(); ;
+            redisConfigs.Password = MStringExtention.DecryptConfigurationValue(configuration, redisConfigs.Password, isSecrectDefault, serectKey) ?? throw new InvalidDataException();
+            redisConfigs.KeyPrefix = MStringExtention.DecryptConfigurationValue(configuration, redisConfigs.KeyPrefix, isSecrectDefault, serectKey) ?? throw new InvalidDataException();
+
+            _ = services.AddSingleton(redisConfigs);
             return services;
         }
 

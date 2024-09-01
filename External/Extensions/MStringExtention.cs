@@ -11,6 +11,15 @@
             return str == null ? null : str.Length <= maxLength ? str : str.Left(maxLength);
         }
 
+        public static string? DecryptConfigurationValue(IConfiguration configuration, string? value, bool isSecrectDefault, string sereckey = "")
+        {
+            return string.IsNullOrEmpty(value)
+                ? value
+                : isSecrectDefault
+                ? configuration.GetCryptConfigValueCipherText(value)
+                : configuration.GetCryptConfigValue(value, sereckey);
+        }
+
         /// <summary>
         /// Converts the input string to a Base64-encoded string.
         /// </summary>

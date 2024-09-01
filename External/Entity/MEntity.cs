@@ -70,8 +70,6 @@
 
         protected MEntity()
         {
-            DateTime utcNow = DateTime.UtcNow;
-            CreatedDateTS = utcNow.GetTimeStamp(includedTimeValue: true);
             EntityId = Guid.NewGuid();
         }
 
@@ -107,7 +105,7 @@
         public double CreatedDateTS { get; set; }
 
         [Column(Order = 108)]
-        public double? UpdatedDateTS { get; set; }
+        public double? LastModificationTimeTs { get; set; }
 
         [Column(Order = 109)]
         public double? DeletedDateTS { get; set; }
@@ -115,6 +113,24 @@
         [Column(Order = 110)]
         [DefaultValue(false)]
         public bool IsDeleted { get; set; }
+
+        [Column(Order = 111)]
+        public DateTime CreationTime { get; set; }
+
+        [Column(Order = 112)]
+        public int? CreatorUserId { get; set; }
+
+        [Column(Order = 113)]
+        public DateTime? LastModificationTime { get; set; }
+
+        [Column(Order = 114)]
+        public int? LastModifierUserId { get; set; }
+
+        [Column(Order = 115)]
+        public int? DeleterUserId { get; set; }
+
+        [Column(Order = 116)]
+        public DateTime? DeletionTime { get; set; }
 
         public void AddDomainEvent(INotification eventItem)
         {

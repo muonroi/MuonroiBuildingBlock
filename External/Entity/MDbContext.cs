@@ -5,7 +5,7 @@
         private readonly IMediator _mediator;
 
         private IDbContextTransaction? _currentTransaction;
-
+        private readonly List<MEntity> _trackEntities = [];
         public bool HasActiveTransaction => _currentTransaction != null;
 
         public DbSet<MUserAccount> UserAccounts { get; set; }
@@ -18,15 +18,27 @@
         public DbSet<MUserToken> UserTokens { get; set; }
         public DbSet<MUserLoginAttempt> MUserLoginAttempts { get; set; }
 
-        private readonly List<MEntity> _trackEntities = [];
+        public MDbContext(DbContextOptions options, IMediator mediator)
+            : base(options)
+        {
+            _mediator = mediator;
+            Debug.WriteLine("BaseDbContext::ctor ->" + GetHashCode());
+        }
 
         public IDbContextTransaction? GetCurrentTransaction()
         {
             return _currentTransaction;
         }
 
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            UpdateTimestamps();
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+
         public async Task<Guid> SaveEntitiesAsync(CancellationToken cancellationToken = default)
         {
+            UpdateTimestamps();
             IExecutionStrategy strategy = Database.CreateExecutionStrategy();
             if (Database.IsInMemory())
             {
@@ -60,14 +72,63 @@
             });
         }
 
+        private void UpdateTimestamps()
+        {
+            IEnumerable<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry> modifiedEntries = ChangeTracker
+                .Entries()
+                .Where(x => x.State is EntityState.Added or EntityState.Modified or EntityState.Deleted);
+
+            foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry? item in modifiedEntries)
+            {
+                switch (item.State)
+                {
+                    case EntityState.Added:
+                        if (item.Entity is MEntity addedEntity)
+                        {
+                            addedEntity.CreatedDateTS = DateTime.UtcNow.GetTimeStamp();
+                            addedEntity.CreationTime = DateTime.UtcNow;
+                            item.State = EntityState.Added;
+                        }
+                        break;
+
+                    case EntityState.Modified:
+                        Entry(item.Entity).Property("Id").IsModified = false;
+                        if (item.Entity is MEntity modifiedEntity)
+                        {
+                            modifiedEntity.LastModificationTime = DateTime.UtcNow;
+                            modifiedEntity.LastModificationTimeTs = DateTime.UtcNow.GetTimeStamp();
+                            item.State = EntityState.Modified;
+                        }
+                        break;
+
+                    case EntityState.Deleted:
+                        if (item.Entity is MEntity deletedEntity)
+                        {
+                            deletedEntity.IsDeleted = true;
+                            deletedEntity.DeletionTime = DateTime.UtcNow;
+                            deletedEntity.DeletedDateTS = DateTime.UtcNow.GetTimeStamp();
+                            item.State = EntityState.Modified;
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
         private async Task DispatchDomainEventsAsync()
         {
-            IEnumerable<MEntity> domainEntities = _trackEntities.Where(x => x.DomainEvents != null && x.DomainEvents.Count > 0).Distinct();
-            List<INotification> domainEvents = domainEntities.SelectMany(x => x.DomainEvents ?? []).ToList();
-            domainEntities.ToList().ForEach(entity =>
-            {
-                entity.ClearDomainEvents();
-            });
+            IEnumerable<MEntity> domainEntities = _trackEntities
+                .Where(x => x.DomainEvents != null && x.DomainEvents.Count > 0)
+                .Distinct();
+
+            List<INotification> domainEvents = domainEntities
+                .SelectMany(x => x.DomainEvents ?? new List<INotification>())
+                .ToList();
+
+            domainEntities.ToList().ForEach(entity => entity.ClearDomainEvents());
+
             IEnumerable<Task> tasks = domainEvents.Select(async domainEvent =>
             {
                 Console.WriteLine($"Dispatching InternalEvent: {domainEvent.GetType()}");
@@ -77,6 +138,7 @@
                 }
                 Console.WriteLine($"Dispatched InternalEvent: {domainEvent.GetType()}");
             });
+
             await Task.WhenAll(tasks);
         }
 
@@ -147,13 +209,6 @@
             _ = builder.ApplyConfiguration(new MRoleConfiguration());
             _ = builder.ApplyConfiguration(new MUserTokenConfiguration());
             _ = builder.ApplyConfiguration(new MUserLoginAttemptConfiguration());
-        }
-
-        public MDbContext(DbContextOptions options, IMediator mediator)
-            : base(options)
-        {
-            _mediator = mediator;
-            Debug.WriteLine("BaseDbContext::ctor ->" + GetHashCode());
         }
     }
 }

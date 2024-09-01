@@ -31,15 +31,13 @@
                     Name = "admin",
                     Surname = "admin",
                     EmailAddress = "admin@muonroi.com",
+                    Password = "$2b$12$pZk2J7RAK/kAjozBMN.AkOIm4SD9OdO.bODsZ/G2LZjHbpGjD/nli", //123qwe,
                     IsEmailConfirmed = true,
                     ShouldChangePasswordOnNextLogin = false,
                     IsActive = true,
-                    Password = "$2b$12$pZk2J7RAK/kAjozBMN.AkOIm4SD9OdO.bODsZ/G2LZjHbpGjD/nli", //123qwe,
                     Salf = "$2b$12$pZk2J7RAK/kAjozBMN.AkO",
                     CreationTime = DateTime.UtcNow
                 };
-
-                user.SetNormalizedNames();
 
                 adminUserForHost = context.Users.Add(user).Entity;
                 _ = context.SaveChanges();

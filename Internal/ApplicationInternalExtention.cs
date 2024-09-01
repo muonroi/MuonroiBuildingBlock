@@ -38,10 +38,16 @@
             return services;
         }
 
-        internal static IServiceCollection AddJwtConfigs(this IServiceCollection services, IConfiguration configuration, MTokenInfo? tokenConfig)
+        internal static IServiceCollection AddJwtConfigs(this IServiceCollection services, IConfiguration configuration, MTokenInfo? tokenConfig,
+            bool isSecrectDefault = true,
+            string serectKey = "")
         {
             tokenConfig ??= new MTokenInfo();
             configuration.GetSection(tokenConfig.SectionName).Bind(tokenConfig);
+            tokenConfig.Audience = MStringExtention.DecryptConfigurationValue(configuration, tokenConfig.Audience, isSecrectDefault, serectKey) ?? throw new InvalidDataException();
+            tokenConfig.Issuer = MStringExtention.DecryptConfigurationValue(configuration, tokenConfig.Issuer, isSecrectDefault, serectKey) ?? throw new InvalidDataException();
+            tokenConfig.SigningKeys = MStringExtention.DecryptConfigurationValue(configuration, tokenConfig.SigningKeys, isSecrectDefault, serectKey) ?? throw new InvalidDataException();
+
             _ = services.AddSingleton(tokenConfig);
             return services;
         }

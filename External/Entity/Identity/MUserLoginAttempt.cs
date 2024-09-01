@@ -1,8 +1,4 @@
-﻿using Muonroi.BuildingBlock.External.Common.Enums;
-using Muonroi.BuildingBlock.External.Entity;
-using Muonroi.BuildingBlock.External.Timing;
-
-namespace Muonroi.BuildingBlock.External.Entity.Identity
+﻿namespace Muonroi.BuildingBlock.External.Entity.Identity
 {
     [Table("MUserLoginAttempts")]
     public class MUserLoginAttempt : MEntity
@@ -58,7 +54,7 @@ namespace Muonroi.BuildingBlock.External.Entity.Identity
         /// </summary>
         public virtual MLoginResultType Result { get; set; }
 
-        public virtual DateTime CreationTime { get; set; }
+        public new virtual DateTime CreationTime { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MUserLoginAttempt"/> class.

@@ -40,7 +40,7 @@ public static class MConfigurationExtension
     }
 
     public static string? GetCryptConfigValue(this IConfiguration configuration, string configKey
-        , bool useConfigureSecretKey
+        , bool useConfigureSecretKey = true
         , string secretKey = "")
     {
         ArgumentNullException.ThrowIfNull(configuration);
