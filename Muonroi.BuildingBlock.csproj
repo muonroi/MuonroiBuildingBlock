@@ -14,9 +14,9 @@
     <PackageReleaseNotes>This library will help you whenever you create a new project without needing much configuration, as everything is already set up, from bearer tokens to authentication, and more.</PackageReleaseNotes>
     <PackAsTool>False</PackAsTool>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <AssemblyVersion>1.1.4</AssemblyVersion>
-    <Version>1.1.4</Version>
-    <FileVersion>1.1.4</FileVersion>
+    <AssemblyVersion>1.1.5</AssemblyVersion>
+    <Version>1.1.5</Version>
+    <FileVersion>1.1.5</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,6 +47,8 @@
     <PackageReference Include="MySql.EntityFrameworkCore" Version="8.0.5" />
     <PackageReference Include="NetJSON" Version="1.4.4" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+    <PackageReference Include="Polly" Version="8.4.1" />
+    <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
     <PackageReference Include="RestEase" Version="1.6.4" />
     <PackageReference Include="Serilog" Version="4.0.1" />

@@ -24,9 +24,8 @@
                 return;
             }
 
-            CorrelationId = context.Request.Headers["X-Correlation-ID"].FirstOrDefault() ?? Guid.NewGuid().ToString();
-            string authorizationHeader = "Authorization";
-            AccessToken = context.Request.Headers[authorizationHeader];
+            CorrelationId = context.Request.Headers[CustomHeader.CorrelationId].FirstOrDefault() ?? Guid.NewGuid().ToString();
+            AccessToken = context.Request.Headers.Authorization;
             Language = context.Request.Headers.AcceptLanguage.ToString().Split(',').FirstOrDefault() ?? "en-US";
             resourceSetting["lang"] = Language;
 
@@ -40,19 +39,19 @@
                 CurrentUsername = GetClaimValue<string>(claims, "username") ?? string.Empty;
             }
 
-            ApiKey = context.Request.Headers["ApiKey"];
+            ApiKey = context.Request.Headers[CustomHeader.ApiKey];
         }
 
         internal MAuthenticateInfoContext(IAmqpContext amqpContext)
         {
-            CorrelationId = amqpContext.GetHeaderByKey("X-Correlation-ID") ?? Guid.NewGuid().ToString();
+            CorrelationId = amqpContext.GetHeaderByKey(CustomHeader.CorrelationId) ?? Guid.NewGuid().ToString();
             _ = int.TryParse(amqpContext.GetHeaderByKey("user_id"), out int result);
             CurrentUserId = result;
 
             CurrentUserGuid = amqpContext.GetHeaderByKey("user_guid") ?? string.Empty;
             CurrentUsername = amqpContext.GetHeaderByKey("username");
             AccessToken = amqpContext.GetHeaderByKey("access_token");
-            ApiKey = amqpContext.GetHeaderByKey("ApiKey");
+            ApiKey = amqpContext.GetHeaderByKey(CustomHeader.ApiKey);
 
             if (!string.IsNullOrEmpty(AccessToken))
             {

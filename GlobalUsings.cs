@@ -122,3 +122,6 @@ global using RedisCacheProvider = Muonroi.BuildingBlock.External.Caching.Distrib
 global using ICacheProvider = Muonroi.BuildingBlock.External.Caching.Distributed.Redis.ICacheProvider;
 global using CommandFlags = Dapper.CommandFlags;
 global using System.Threading;
+global using Polly;
+global using Muonroi.BuildingBlock.External.Polly;
+global using Polly.Extensions.Http;
