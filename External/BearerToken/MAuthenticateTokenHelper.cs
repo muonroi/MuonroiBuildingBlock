@@ -1,50 +1,60 @@
-﻿namespace Muonroi.BuildingBlock.External.BearerToken
+﻿namespace Muonroi.BuildingBlock.External.BearerToken;
+
+public class MAuthenticateTokenHelper
 {
-    public static class MAuthenticateTokenHelper
+    private readonly MTokenInfo _tokenConfig;
+    private readonly RSA _rsa;
+
+    public MAuthenticateTokenHelper(MTokenInfo tokenConfig)
     {
-        public static string GenerateAuthenticateToken(MTokenInfo tokenConfig, MUserModel user, DateTime? expiresTime = null)
+        _tokenConfig = tokenConfig ?? throw new ArgumentNullException(nameof(tokenConfig));
+
+        _rsa = RSA.Create();
+
+        _rsa.ImportFromPem(_tokenConfig.PrivateKey.ToCharArray());
+    }
+
+    public string GenerateAuthenticateToken(MUserModel user, DateTime? expiresTime = null)
+    {
+        try
         {
-            try
+            List<Claim> claims =
+            [
+                new Claim("username", user.Username),
+                new Claim(ClaimTypes.NameIdentifier, user.UserGuid),
+            ];
+
+            foreach (string role in user.Roles)
             {
-                List<Claim> claims =
-                [
-                    new Claim("user_id", user.UserId),
-                    new Claim("user_guid", user.UserGuid),
-                    new Claim("username", user.Username),
-                    new Claim(JwtRegisteredClaimNames.Iss, tokenConfig.Issuer),
-                    new Claim(JwtRegisteredClaimNames.Aud, tokenConfig.Audience),
-                ];
-
-                // Add roles to claims
-                foreach (string role in user.Roles)
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, role));
-                }
-
-                using RSA rsa = RSA.Create();
-                rsa.ImportFromPem(tokenConfig.PrivateKey.ToCharArray());
-
-                RsaSecurityKey signingKey = new(rsa);
-                SigningCredentials credentials = new(signingKey, SecurityAlgorithms.RsaSha256);
-
-                SecurityTokenDescriptor tokenDescriptor = new()
-                {
-                    Issuer = tokenConfig.Issuer,
-                    Audience = tokenConfig.Audience,
-                    Subject = new ClaimsIdentity(claims),
-                    Expires = expiresTime ?? DateTime.UtcNow.AddMinutes(tokenConfig.ExpiryMinutes),
-                    SigningCredentials = credentials
-                };
-
-                JwtSecurityTokenHandler tokenHandler = new();
-                SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-                return tokenHandler.WriteToken(token);
+                claims.Add(new Claim(ClaimTypes.Role, role));
             }
-            catch (Exception ex)
+
+            RsaSecurityKey signingKey = new(_rsa);
+            SigningCredentials credentials = new(signingKey, SecurityAlgorithms.RsaSha256);
+
+            SecurityTokenDescriptor tokenDescriptor = new()
             {
-                Console.WriteLine($"Exception occurred: {ex.Message}");
-                throw;
-            }
+                Issuer = _tokenConfig.Issuer,
+                Audience = _tokenConfig.Audience,
+                Subject = new ClaimsIdentity(claims),
+                Expires = expiresTime ?? DateTime.UtcNow.AddMinutes(_tokenConfig.ExpiryMinutes),
+                SigningCredentials = credentials
+            };
+
+            JwtSecurityTokenHandler tokenHandler = new();
+            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+
+            return tokenHandler.WriteToken(token);
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception occurred: {ex.Message}");
+            throw;
+        }
+    }
+
+    public void Dispose()
+    {
+        _rsa.Dispose();
     }
 }

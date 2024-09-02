@@ -1,8 +1,13 @@
 ﻿namespace Muonroi.BuildingBlock.External.Common.Constants
 {
-    public class MTokenInfo(string sectionName = "TokenConfigs")
+    public class MTokenInfo
     {
-        public string SectionName = sectionName;
+        public MTokenInfo()
+        {
+            SectionName = "TokenConfigs";
+        }
+
+        public string SectionName { get; set; }
         public virtual string SigningKeys { get; set; } = null!;
         public virtual string Issuer { get; set; } = null!;
         public virtual string Audience { get; set; } = null!;

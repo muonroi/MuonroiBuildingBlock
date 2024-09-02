@@ -2,19 +2,27 @@
 {
     internal static class InfrastructureInternalExtensions
     {
-        internal static IServiceCollection ResolveBearerToken<T>(this IServiceCollection services, string policyUrl = "policy.html")
-            where T : MTokenInfo
+        internal static IServiceCollection ResolveBearerToken<T>(this IServiceCollection services, IConfiguration configuration, string policyUrl = "policy.html")
+       where T : MTokenInfo, new()
         {
-            // Build the service provider to resolve dependencies
-            using ServiceProvider serviceProvider = services.BuildServiceProvider();
-            T jwtConfig = serviceProvider.GetRequiredService<T>();
+            T nameSection = new();
+            _ = services.Configure<T>(configuration.GetSection(nameSection.SectionName));
+
+            ServiceProvider serviceProvider = services.BuildServiceProvider();
+
+            T jwtConfig = serviceProvider.GetRequiredService<IOptions<T>>().Value;
+
+            jwtConfig.Issuer = configuration.GetCryptConfigValueCipherText(jwtConfig.Issuer)!;
+            jwtConfig.Audience = configuration.GetCryptConfigValueCipherText(jwtConfig.Audience)!;
+            jwtConfig.SigningKeys = configuration.GetCryptConfigValueCipherText(jwtConfig.SigningKeys)!;
 
             if (string.IsNullOrEmpty(jwtConfig.SigningKeys))
             {
-                throw new Exception("SecretKey is null or empty");
+                throw new Exception("SigningKeys is null or empty");
             }
 
-            // Configure API versioning with sunset policy
+            _ = services.AddSingleton<MAuthenticateTokenHelper>();
+
             _ = services.AddApiVersioning(options =>
             {
                 options.ReportApiVersions = true;
@@ -27,21 +35,21 @@
 
             IdentityModelEventSource.ShowPII = true;
 
-            // Configure RSA for JWT token validation
             RSA rsa = RSA.Create();
             rsa.ImportFromPem(jwtConfig.PublicKey.ToCharArray());
 
             TokenValidationParameters validationParameters = new()
             {
-                ValidateIssuer = false,
-                ValidateAudience = false,
+                ValidateIssuer = true,
+                ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new RsaSecurityKey(rsa),
-                ClockSkew = TimeSpan.Zero
+                ClockSkew = TimeSpan.Zero,
+                ValidIssuer = jwtConfig.Issuer,
+                ValidAudience = jwtConfig.Audience
             };
 
-            // Configure JWT Bearer authentication
             _ = services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = "Bearer";

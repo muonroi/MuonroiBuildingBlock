@@ -19,6 +19,7 @@
         internal MAuthenticateInfoContext(IHttpContextAccessor httpContextAccessor, ResourceSetting resourceSetting)
         {
             HttpContext? context = httpContextAccessor.HttpContext;
+
             if (context == null)
             {
                 return;

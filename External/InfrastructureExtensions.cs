@@ -76,8 +76,8 @@
         }
 
         public static IServiceCollection AddRedisConfiguration(this IServiceCollection services, IConfiguration configuration,
-    bool isSecrectDefault = true,
-    string serectKey = "")
+        bool isSecrectDefault = true,
+        string serectKey = "")
         {
             RedisConfigs redisConfigs = new();
             configuration.GetSection(redisConfigs.SectionName).Bind(redisConfigs);
@@ -94,6 +94,7 @@
         public static IApplicationBuilder UseDefaultMiddleware(this IApplicationBuilder app)
         {
             // Add custom exception handling middleware
+            _ = app.UseMiddleware<MAuthenMiddleware>();
             _ = app.UseMiddleware<MExceptionMiddleware>();
             return app;
         }
@@ -132,10 +133,10 @@
             return app;
         }
 
-        public static IServiceCollection AddValidateBearerToken<T>(this IServiceCollection services, string policyUrl = "policy.html")
-            where T : MTokenInfo
+        public static IServiceCollection AddValidateBearerToken<T>(this IServiceCollection services, IConfiguration configuration, string policyUrl = "policy.html")
+            where T : MTokenInfo, new()
         {
-            return services.ResolveBearerToken<T>(policyUrl);
+            return services.ResolveBearerToken<T>(configuration, policyUrl);
         }
     }
 }
