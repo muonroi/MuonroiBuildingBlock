@@ -2,6 +2,7 @@
 {
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
+    [Authorize]
     public abstract class MControllerBase(IMediator mediator, ILogger logger) : ControllerBase
     {
         protected IMediator Mediator { get; } = mediator;

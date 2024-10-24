@@ -2,8 +2,9 @@
 {
     internal static class InfrastructureInternalExtensions
     {
-        internal static IServiceCollection ResolveBearerToken<T>(this IServiceCollection services, IConfiguration configuration, string policyUrl = "policy.html")
+        internal static IServiceCollection ResolveBearerToken<T, TPermission>(this IServiceCollection services, IConfiguration configuration, string policyUrl = "policy.html")
        where T : MTokenInfo, new()
+        where TPermission : Enum
         {
             T nameSection = new();
             _ = services.Configure<T>(configuration.GetSection(nameSection.SectionName));
@@ -21,7 +22,7 @@
                 throw new Exception("SigningKeys is null or empty");
             }
 
-            _ = services.AddSingleton<MAuthenticateTokenHelper>();
+            _ = services.AddSingleton<MAuthenticateTokenHelper<TPermission>>();
 
             _ = services.AddApiVersioning(options =>
             {

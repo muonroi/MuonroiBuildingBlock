@@ -30,10 +30,12 @@
                 _ => throw new ArgumentException("Unsupported database type: " + databaseConfigs.DbType),
             } ?? throw new ArgumentNullException(nameof(connectionString), "Connection string is not provided or is empty.");
 
+            connectionString = MStringExtention.DecryptConfigurationValue(configuration, connectionString, true, string.Empty) ?? throw new ArgumentNullException(nameof(connectionString), "Connection string is not provided or is empty.");
+
             _ = databaseConfigs.DbType switch
             {
                 nameof(DbTypes.SqlServer) => builder.UseSqlServer(connectionString),
-                nameof(DbTypes.MySql) => builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)),
+                nameof(DbTypes.MySql) => builder.UseMySql(connectionString, Microsoft.EntityFrameworkCore.ServerVersion.AutoDetect(connectionString)),
                 nameof(DbTypes.PostgreSql) => builder.UseNpgsql(connectionString),
                 nameof(DbTypes.Sqlite) => builder.UseSqlite(connectionString),
                 _ => throw new ArgumentException("Unsupported database type: " + databaseConfigs.DbType),

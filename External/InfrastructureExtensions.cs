@@ -9,12 +9,12 @@
                 IConfiguration configuration,
                 MTokenInfo? tokenConfig = null,
                 MPaginationConfig? paginationConfigs = null,
-                bool isSecrectDefault = true,
-                string serectKey = "")
+                bool isSecretDefault = true,
+                string secreteKey = "")
         {
             _ = services.AddControllersWithOptions()
                     .AddApiDocumentation<TProgram>()
-                    .AddCoreServices(configuration, isSecrectDefault, serectKey, paginationConfigs, tokenConfig)
+                    .AddCoreServices(configuration, isSecretDefault, secreteKey, paginationConfigs, tokenConfig)
                     .AddAuthContext();
 
             using ServiceProvider serviceProvider = services.BuildServiceProvider();
@@ -40,6 +40,16 @@
             return services;
         }
 
+        public static IServiceCollection AddPermissionFilter<TPermission>(this IServiceCollection services) where TPermission : Enum
+        {
+            _ = services.AddScoped<PermissionFilter<TPermission>>();
+            _ = services.AddMvc(options =>
+            {
+                _ = options.Filters.AddService<PermissionFilter<TPermission>>();
+            });
+            return services;
+        }
+
         private static IServiceCollection AddApiDocumentation<TProgram>(this IServiceCollection services)
         {
             _ = services.AddEndpointsApiExplorer()
@@ -57,8 +67,8 @@
         private static IServiceCollection AddCoreServices(
             this IServiceCollection services,
             IConfiguration configuration,
-            bool isSecrectDefault,
-            string serectKey,
+            bool isSecretDefault,
+            string secretKey,
             MPaginationConfig? paginationConfigs,
             MTokenInfo? tokenConfig)
         {
@@ -67,7 +77,7 @@
                 .AddSingleton<IMJsonSerializeService, MJsonSerializeService>()
                 .AddSingleton<IMDateTimeService, MDateTimeService>()
                 .AddSingleton<ICacheProvider, RedisCacheProvider>()
-                .AddRedisConfiguration(configuration, isSecrectDefault, serectKey)
+                .AddRedisConfiguration(configuration, isSecretDefault, secretKey)
                 .AddPaginationConfigs(configuration, paginationConfigs)
                 .AddJwtConfigs(configuration, tokenConfig)
                 .AddSystemConfig(configuration);
@@ -76,16 +86,16 @@
         }
 
         public static IServiceCollection AddRedisConfiguration(this IServiceCollection services, IConfiguration configuration,
-        bool isSecrectDefault = true,
-        string serectKey = "")
+        bool isSecretDefault = true,
+        string secretKey = "")
         {
             RedisConfigs redisConfigs = new();
             configuration.GetSection(redisConfigs.SectionName).Bind(redisConfigs);
 
-            redisConfigs.Host = MStringExtention.DecryptConfigurationValue(configuration, redisConfigs.Host, isSecrectDefault, serectKey) ?? throw new InvalidDataException();
-            redisConfigs.Port = MStringExtention.DecryptConfigurationValue(configuration, redisConfigs.Port, isSecrectDefault, serectKey) ?? throw new InvalidDataException(); ;
-            redisConfigs.Password = MStringExtention.DecryptConfigurationValue(configuration, redisConfigs.Password, isSecrectDefault, serectKey) ?? throw new InvalidDataException();
-            redisConfigs.KeyPrefix = MStringExtention.DecryptConfigurationValue(configuration, redisConfigs.KeyPrefix, isSecrectDefault, serectKey) ?? throw new InvalidDataException();
+            redisConfigs.Host = MStringExtention.DecryptConfigurationValue(configuration, redisConfigs.Host, isSecretDefault, secretKey) ?? throw new InvalidDataException();
+            redisConfigs.Port = MStringExtention.DecryptConfigurationValue(configuration, redisConfigs.Port, isSecretDefault, secretKey) ?? throw new InvalidDataException(); ;
+            redisConfigs.Password = MStringExtention.DecryptConfigurationValue(configuration, redisConfigs.Password, isSecretDefault, secretKey) ?? throw new InvalidDataException();
+            redisConfigs.KeyPrefix = MStringExtention.DecryptConfigurationValue(configuration, redisConfigs.KeyPrefix, isSecretDefault, secretKey) ?? throw new InvalidDataException();
 
             _ = services.AddSingleton(redisConfigs);
             return services;
@@ -133,10 +143,11 @@
             return app;
         }
 
-        public static IServiceCollection AddValidateBearerToken<T>(this IServiceCollection services, IConfiguration configuration, string policyUrl = "policy.html")
+        public static IServiceCollection AddValidateBearerToken<T, TPermission>(this IServiceCollection services, IConfiguration configuration, string policyUrl = "policy.html")
             where T : MTokenInfo, new()
+            where TPermission : Enum
         {
-            return services.ResolveBearerToken<T>(configuration, policyUrl);
+            return services.ResolveBearerToken<T, TPermission>(configuration, policyUrl);
         }
     }
 }

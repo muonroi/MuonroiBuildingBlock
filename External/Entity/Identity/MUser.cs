@@ -1,4 +1,6 @@
-﻿namespace Muonroi.BuildingBlock.External.Entity.Identity
+﻿
+
+namespace Muonroi.BuildingBlock.External.Entity.Identity
 {
     [Table("MUsers")]
     public class MUser : MEntity
@@ -12,18 +14,6 @@
         }
 
         public const int MaxConcurrencyStampLength = 128;
-
-        // Property for ProfilePictureId
-        public virtual int? ProfilePictureId { get; set; }
-
-        public virtual bool ShouldChangePasswordOnNextLogin { get; set; }
-        public virtual DateTime? SignInTokenExpireTimeUtc { get; set; }
-        public virtual string? SignInToken { get; set; }
-        public virtual string? GoogleAuthenticatorKey { get; set; }
-        public virtual string? RecoveryCode { get; set; }
-
-        [StringLength(MaxAuthenticationSourceLength)]
-        public virtual string? AuthenticationSource { get; set; }
 
         private string _userName = string.Empty;
 
@@ -101,7 +91,18 @@
         [StringLength(MaxConcurrencyStampLength)]
         public virtual string? ConcurrencyStamp { get; set; } = Guid.NewGuid().ToString();
 
-        public virtual string? Salf { get; set; }
+        public virtual string? Salt { get; set; }
+
+        public virtual int? ProfilePictureId { get; set; }
+
+        public virtual bool ShouldChangePasswordOnNextLogin { get; set; }
+        public virtual DateTime? SignInTokenExpireTimeUtc { get; set; }
+        public virtual string? SignInToken { get; set; }
+        public virtual string? GoogleAuthenticatorKey { get; set; }
+        public virtual string? RecoveryCode { get; set; }
+
+        [StringLength(MaxAuthenticationSourceLength)]
+        public virtual string? AuthenticationSource { get; set; }
 
         public virtual void SetNewPasswordResetCode()
         {
@@ -124,5 +125,7 @@
         {
             EmailConfirmationCode = Guid.NewGuid().ToString("N").Truncate(MaxEmailConfirmationCodeLength);
         }
+
+
     }
 }

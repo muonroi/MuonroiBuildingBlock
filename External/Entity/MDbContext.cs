@@ -1,4 +1,6 @@
-﻿namespace Muonroi.BuildingBlock.External.Entity
+﻿
+
+namespace Muonroi.BuildingBlock.External.Entity
 {
     public class MDbContext : DbContext, IMUnitOfWork, IDisposable, IIdentityAuth
     {
@@ -8,6 +10,7 @@
         private readonly List<MEntity> _trackEntities = [];
         public bool HasActiveTransaction => _currentTransaction != null;
 
+        public DbSet<MRolePermission> RolePermissions { get; set; }
         public DbSet<MUserAccount> UserAccounts { get; set; }
         public DbSet<MUser> Users { get; set; }
         public DbSet<MRole> Roles { get; set; }
@@ -124,7 +127,7 @@
                 .Distinct();
 
             List<INotification> domainEvents = domainEntities
-                .SelectMany(x => x.DomainEvents ?? new List<INotification>())
+                .SelectMany(x => x.DomainEvents ?? [])
                 .ToList();
 
             domainEntities.ToList().ForEach(entity => entity.ClearDomainEvents());
@@ -200,6 +203,8 @@
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            CustomColumnOrderConvention customConvention = new();
+            customConvention.Customize(builder, this);
             _ = builder.ApplyConfiguration(new MUserConfiguration());
             _ = builder.ApplyConfiguration(new MUserAccountConfiguration());
             _ = builder.ApplyConfiguration(new MUserLoginConfiguration());

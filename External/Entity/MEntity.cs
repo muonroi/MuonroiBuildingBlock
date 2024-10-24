@@ -127,7 +127,7 @@
         public int? LastModifierUserId { get; set; }
 
         [Column(Order = 115)]
-        public int? DeleterUserId { get; set; }
+        public int? DeleteUserId { get; set; }
 
         [Column(Order = 116)]
         public DateTime? DeletionTime { get; set; }

@@ -39,14 +39,14 @@
         }
 
         internal static IServiceCollection AddJwtConfigs(this IServiceCollection services, IConfiguration configuration, MTokenInfo? tokenConfig,
-            bool isSecrectDefault = true,
-            string serectKey = "")
+            bool isSecretDefault = true,
+            string secretKey = "")
         {
             tokenConfig ??= new MTokenInfo();
             configuration.GetSection(tokenConfig.SectionName).Bind(tokenConfig);
-            tokenConfig.Audience = MStringExtention.DecryptConfigurationValue(configuration, tokenConfig.Audience, isSecrectDefault, serectKey) ?? throw new InvalidDataException();
-            tokenConfig.Issuer = MStringExtention.DecryptConfigurationValue(configuration, tokenConfig.Issuer, isSecrectDefault, serectKey) ?? throw new InvalidDataException();
-            tokenConfig.SigningKeys = MStringExtention.DecryptConfigurationValue(configuration, tokenConfig.SigningKeys, isSecrectDefault, serectKey) ?? throw new InvalidDataException();
+            tokenConfig.Audience = MStringExtention.DecryptConfigurationValue(configuration, tokenConfig.Audience, isSecretDefault, secretKey) ?? throw new InvalidDataException();
+            tokenConfig.Issuer = MStringExtention.DecryptConfigurationValue(configuration, tokenConfig.Issuer, isSecretDefault, secretKey) ?? throw new InvalidDataException();
+            tokenConfig.SigningKeys = MStringExtention.DecryptConfigurationValue(configuration, tokenConfig.SigningKeys, isSecretDefault, secretKey) ?? throw new InvalidDataException();
 
             _ = services.AddSingleton(tokenConfig);
             return services;

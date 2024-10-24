@@ -1,6 +1,8 @@
-﻿namespace Muonroi.BuildingBlock.External.BearerToken;
+﻿
 
-public class MAuthenticateTokenHelper
+namespace Muonroi.BuildingBlock.External.BearerToken;
+
+public class MAuthenticateTokenHelper<TPermission> where TPermission : Enum
 {
     private readonly MTokenInfo _tokenConfig;
     private readonly RSA _rsa;
@@ -14,7 +16,7 @@ public class MAuthenticateTokenHelper
         _rsa.ImportFromPem(_tokenConfig.PrivateKey.ToCharArray());
     }
 
-    public string GenerateAuthenticateToken(MUserModel user, DateTime? expiresTime = null)
+    public string GenerateAuthenticateToken(MUserModel user, List<TPermission> permissions, DateTime? expiresTime = null)
     {
         try
         {
@@ -24,10 +26,15 @@ public class MAuthenticateTokenHelper
                 new Claim(ClaimTypes.NameIdentifier, user.UserGuid),
             ];
 
+            long permissionsBitmask = MPermissionExtension<TPermission>.CalculatePermissionsBitmask(permissions);
+
+            claims.Add(new Claim("Permissions", permissionsBitmask.ToString()));
+
             foreach (string role in user.Roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
+
 
             RsaSecurityKey signingKey = new(_rsa);
             SigningCredentials credentials = new(signingKey, SecurityAlgorithms.RsaSha256);

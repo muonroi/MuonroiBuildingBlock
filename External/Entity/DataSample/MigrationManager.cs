@@ -7,10 +7,17 @@
         {
             using (IServiceScope scope = app.Services.CreateScope())
             {
+                IPermissionSyncService permissionSyncService = scope.ServiceProvider.GetRequiredService<IPermissionSyncService>();
+
+                permissionSyncService.SyncPermissionsAsync().Wait();
+
                 TContext context = scope.ServiceProvider.GetRequiredService<TContext>();
+
                 context.Database.Migrate();
 
                 new InitialHostDbBuilder<TContext>(context).Create();
+
+
             }
             return app;
         }

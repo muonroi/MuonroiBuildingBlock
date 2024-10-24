@@ -28,7 +28,7 @@
             {
                 error = new
                 {
-                    message = MMethodResultHelpers.GetErrorMessage(nameof(SystemEnum.SYS00)),
+                    message = MMethodResultHelpers.GetErrorMessage(nameof(SystemEnum.UnhandledException)),
                     details = ex.Message
                 }
             };
