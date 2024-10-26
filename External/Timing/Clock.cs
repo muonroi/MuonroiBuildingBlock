@@ -28,6 +28,11 @@
         /// </summary>
         public static DateTime Now => Provider.Now;
 
+        /// <summary>
+        /// Gets UtcNow using current <see cref="Provider"/>.
+        /// </summary>
+        public static DateTime UtcNow => Provider.UtcNow;
+
         public static DateTimeKind Kind => Provider.Kind;
 
         /// <summary>

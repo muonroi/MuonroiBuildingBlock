@@ -2,8 +2,9 @@
 
 namespace Muonroi.BuildingBlock.External.Middleware
 {
-    public class MAuthenMiddleware<TDbContext>(TDbContext dbContext, RequestDelegate next)
+    public class MAuthenMiddleware<TDbContext, TPermission>(TDbContext dbContext, RequestDelegate next)
         where TDbContext : MDbContext
+        where TPermission : Enum
     {
         private readonly RequestDelegate _next = next;
 
@@ -17,7 +18,7 @@ namespace Muonroi.BuildingBlock.External.Middleware
             {
                 context.Request.Headers.Authorization = $"Bearer {authorizationHeader}";
 
-                await AuthorizeInternal<TDbContext>.ResolveTokenValidityKey(authorizationHeader, _dbContext, context);
+                await AuthorizeInternal<TDbContext, TPermission>.ResolveTokenValidityKey(authorizationHeader, _dbContext, context);
             }
             await _next(context);
         }

@@ -1,4 +1,4 @@
-﻿namespace BrightFocus.Core.Models.Requests.Login
+﻿namespace Muonroi.BuildingBlock.External.Common.Models.Requests.Login
 {
     public class LoginRequestModel
     {

@@ -118,7 +118,7 @@ namespace Muonroi.BuildingBlock.External.Entity.Identity
         public virtual void SetSignInToken()
         {
             SignInToken = Guid.NewGuid().ToString();
-            SignInTokenExpireTimeUtc = Clock.Now.AddMinutes(1).ToUniversalTime();
+            SignInTokenExpireTimeUtc = Clock.UtcNow.AddMinutes(1).ToUniversalTime();
         }
 
         public virtual void SetNewEmailConfirmationCode()

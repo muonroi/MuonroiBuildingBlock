@@ -7,6 +7,9 @@
     {
         public DateTime Now => DateTime.Now;
 
+        public DateTime UtcNow => DateTime.UtcNow;
+
+
         public DateTimeKind Kind => DateTimeKind.Local;
 
         public bool SupportsMultipleTimezone => false;

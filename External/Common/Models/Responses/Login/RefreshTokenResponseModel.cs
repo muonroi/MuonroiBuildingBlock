@@ -1,4 +1,4 @@
-﻿namespace BrightFocus.Core.Models.Responses.Login
+﻿namespace Muonroi.BuildingBlock.External.Common.Models.Responses.Login
 {
     public class RefreshTokenResponseModel
     {

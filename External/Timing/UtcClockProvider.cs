@@ -5,7 +5,9 @@
     /// </summary>
     public class UtcClockProvider : IClockProvider
     {
-        public DateTime Now => DateTime.UtcNow;
+        public DateTime Now => DateTime.Now;
+
+        public DateTime UtcNow => DateTime.UtcNow;
 
         public DateTimeKind Kind => DateTimeKind.Utc;
 
@@ -13,12 +15,9 @@
 
         public DateTime Normalize(DateTime dateTime)
         {
-            if (dateTime.Kind == DateTimeKind.Unspecified)
-            {
-                return DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
-            }
-
-            return dateTime.Kind == DateTimeKind.Local ? dateTime.ToUniversalTime() : dateTime;
+            return dateTime.Kind == DateTimeKind.Unspecified
+                ? DateTime.SpecifyKind(dateTime, DateTimeKind.Utc)
+                : dateTime.Kind == DateTimeKind.Local ? dateTime.ToUniversalTime() : dateTime;
         }
 
         internal UtcClockProvider()

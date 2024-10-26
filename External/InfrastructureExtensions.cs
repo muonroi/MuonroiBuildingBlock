@@ -101,11 +101,12 @@ namespace Muonroi.BuildingBlock.External
             return services;
         }
 
-        public static IApplicationBuilder UseDefaultMiddleware<TDbContext>(this IApplicationBuilder app)
+        public static IApplicationBuilder UseDefaultMiddleware<TDbContext, TPermission>(this IApplicationBuilder app)
             where TDbContext : MDbContext
+            where TPermission : Enum
         {
             // Add custom exception handling middleware
-            _ = app.UseMiddleware<MAuthenMiddleware<TDbContext>>();
+            _ = app.UseMiddleware<MAuthenMiddleware<TDbContext, TPermission>>();
             _ = app.UseMiddleware<MExceptionMiddleware>();
             return app;
         }

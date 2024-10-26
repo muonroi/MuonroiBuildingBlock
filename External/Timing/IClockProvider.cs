@@ -7,6 +7,11 @@
         //     Gets Now.
         DateTime Now { get; }
 
+        /// <summary>
+        /// Gets UtcNow.
+        /// </summary>
+        DateTime UtcNow { get; }
+
         //
         // Summary:
         //     Gets kind.

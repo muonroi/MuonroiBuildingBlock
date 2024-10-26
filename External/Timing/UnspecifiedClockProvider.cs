@@ -3,6 +3,8 @@
     public class UnspecifiedClockProvider : IClockProvider
     {
         public DateTime Now => DateTime.Now;
+        public DateTime UtcNow => DateTime.UtcNow;
+
 
         public DateTimeKind Kind => DateTimeKind.Unspecified;
 
