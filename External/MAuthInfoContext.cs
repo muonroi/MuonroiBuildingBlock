@@ -2,21 +2,19 @@
 {
     public partial class MAuthenticateInfoContext
     {
-        public string UserId { get; set; } = string.Empty;
+        public MAuthenticateInfoContext(bool isAuthenticated)
+        {
+            IsAuthenticated = isAuthenticated;
+        }
         public string CorrelationId { get; set; } = string.Empty;
-        public int CurrentUserId { get; set; }
         public string CurrentUserGuid { get; set; } = string.Empty;
-        public string? CurrentUsername { get; set; } = string.Empty;
+        public string CurrentUsername { get; set; } = string.Empty;
+        public string TokenValidityKey { get; set; } = string.Empty;
         public string? AccessToken { get; set; } = string.Empty;
         public string? ApiKey { get; set; } = string.Empty;
-        public List<string> Roles { get; set; } = [];
+        public string? Permission { get; set; } = string.Empty;
         public string Language { get; set; } = string.Empty;
         public string Caller { get; set; } = string.Empty;
-        public string ClientIpAddr { get; set; } = string.Empty;
-        public string AgentCode { get; set; } = string.Empty;
         public bool IsAuthenticated { get; set; }
-
-        public MAuthenticateInfoContext()
-        { }
     }
 }

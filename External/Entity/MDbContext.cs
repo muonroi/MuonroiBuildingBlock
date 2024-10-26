@@ -11,6 +11,7 @@ namespace Muonroi.BuildingBlock.External.Entity
         public bool HasActiveTransaction => _currentTransaction != null;
 
         public DbSet<MRolePermission> RolePermissions { get; set; }
+        public DbSet<MRefreshToken> RefreshTokens { get; set; }
         public DbSet<MUserAccount> UserAccounts { get; set; }
         public DbSet<MUser> Users { get; set; }
         public DbSet<MRole> Roles { get; set; }

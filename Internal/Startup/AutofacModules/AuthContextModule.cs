@@ -1,4 +1,6 @@
-﻿namespace Muonroi.BuildingBlock.Internal.Startup.AutofacModules
+﻿
+
+namespace Muonroi.BuildingBlock.Internal.Startup.AutofacModules
 {
     internal class AuthContextModule : Module
     {
@@ -19,16 +21,16 @@
                 ILogger<MAuthenticateInfoContext> logger = context.Resolve<ILogger<MAuthenticateInfoContext>>();
                 ResourceSetting resourceSetting = context.Resolve<ResourceSetting>();
                 IHttpContextAccessor httpContextAccessor = context.Resolve<IHttpContextAccessor>();
+                IConfiguration configuration = context.Resolve<IConfiguration>();
                 MAuthenticateInfoContext authContext;
                 if (httpContextAccessor?.HttpContext != null)
                 {
-                    authContext = new MAuthenticateInfoContext(httpContextAccessor, resourceSetting);
+                    authContext = new MAuthenticateInfoContext(httpContextAccessor, resourceSetting, configuration);
                     logger.LogTrace("Init AuthContext by IHttpContextAccessor: {AuthContext}", authContext);
                 }
                 else
                 {
                     IAmqpContext? amqpContext = context.ResolveOptional<IAmqpContext>();
-
                     if (amqpContext != null)
                     {
                         authContext = new MAuthenticateInfoContext(amqpContext);
@@ -36,7 +38,7 @@
                     }
                     else
                     {
-                        authContext = new MAuthenticateInfoContext();
+                        authContext = new MAuthenticateInfoContext(false);
                         logger.LogWarning("Failed to initialize AuthContext by IAmqpContext. Using default constructor.");
                     }
                 }

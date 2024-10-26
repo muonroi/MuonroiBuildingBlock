@@ -6,7 +6,7 @@
         protected readonly MDbContext _dbBaseContext;
         protected readonly DbSet<T> _dbSet;
 
-        public int? CurrentUserId => _authContext?.CurrentUserId;
+        public string? CurrentUserId => _authContext?.CurrentUserGuid;
         public string? CurrentUsername => _authContext?.CurrentUsername;
         public IMUnitOfWork UnitOfWork => _dbBaseContext;
         protected IQueryable<T> Queryable => _dbSet.Where(m => !m.IsDeleted);
@@ -49,8 +49,7 @@
                 DateTime utcNow = DateTime.UtcNow;
                 newEntity.CreatedDateTS = utcNow.GetTimeStamp(true);
                 newEntity.LastModificationTimeTs = utcNow.GetTimeStamp(true);
-                newEntity.CreatedUserId = _authContext?.CurrentUserId;
-                newEntity.CreatedUserName = _authContext?.CurrentUsername;
+                newEntity.CreatorUserId = string.IsNullOrEmpty(_authContext?.CurrentUserGuid) ? Guid.Empty : Guid.Parse(_authContext?.CurrentUserGuid ?? Guid.Empty.ToString());
                 newEntity.EntityId = Guid.NewGuid();
                 newEntity.AddDomainEvent(new MEntityCreatedEvent<T>(newEntity));
                 _dbBaseContext.TrackEntity(newEntity);
@@ -92,8 +91,7 @@
             {
                 deleteEntity.IsDeleted = true;
                 deleteEntity.DeletedDateTS = DateTime.UtcNow.GetTimeStamp(true);
-                deleteEntity.DeletedUserId = _authContext?.CurrentUserId;
-                deleteEntity.DeletedUserName = _authContext?.CurrentUsername;
+                deleteEntity.DeletedUserId = string.IsNullOrEmpty(_authContext?.CurrentUserGuid) ? null : Guid.Parse(_authContext?.CurrentUserGuid ?? Guid.Empty.ToString());
                 deleteEntity.AddDomainEvent(new MEntityDeletedEvent<T>(deleteEntity));
                 _dbBaseContext.TrackEntity(deleteEntity);
                 return Task.FromResult(true);
@@ -109,8 +107,7 @@
             try
             {
                 updateEntity.LastModificationTimeTs = DateTime.UtcNow.GetTimeStamp(true);
-                updateEntity.UpdatedUserId = _authContext?.CurrentUserId;
-                updateEntity.UpdatedUserName = _authContext?.CurrentUsername;
+                updateEntity.LastModificationUserId = string.IsNullOrEmpty(_authContext?.CurrentUserGuid) ? null : Guid.Parse(_authContext?.CurrentUserGuid ?? Guid.Empty.ToString());
                 updateEntity.AddDomainEvent(new MEntityChangedEvent<T>(updateEntity));
                 _dbBaseContext.TrackEntity(updateEntity);
                 return _dbSet.Update(updateEntity).Entity;

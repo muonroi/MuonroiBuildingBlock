@@ -1,22 +1,12 @@
-﻿namespace Muonroi.BuildingBlock.External
+﻿
+
+namespace Muonroi.BuildingBlock.External
 {
     public partial class MAuthenticateInfoContext
     {
-        public MAuthenticateInfoContext(int currentUserId, string currentUserGuid, string currentUsername, string accessToken, string apiKey)
-        {
-            CurrentUserId = currentUserId;
-            CurrentUserGuid = currentUserGuid;
-            CurrentUsername = currentUsername;
-            AccessToken = accessToken;
-            ApiKey = apiKey;
-
-            if (!string.IsNullOrEmpty(AccessToken))
-            {
-                ExtractRolesFromToken(AccessToken);
-            }
-        }
-
-        internal MAuthenticateInfoContext(IHttpContextAccessor httpContextAccessor, ResourceSetting resourceSetting)
+        internal MAuthenticateInfoContext(IHttpContextAccessor httpContextAccessor,
+            ResourceSetting resourceSetting,
+            IConfiguration configuration)
         {
             HttpContext? context = httpContextAccessor.HttpContext;
 
@@ -27,48 +17,31 @@
 
             CorrelationId = context.Request.Headers[CustomHeader.CorrelationId].FirstOrDefault() ?? Guid.NewGuid().ToString();
             AccessToken = context.Request.Headers.Authorization;
-            Language = context.Request.Headers.AcceptLanguage.ToString().Split(',').FirstOrDefault() ?? "en-US";
-            resourceSetting["lang"] = Language;
+            Language = context.Request.Headers.AcceptLanguage.ToString().Split(',').FirstOrDefault() ?? "vi-VN";
+            resourceSetting[ClaimConstants.UserIdentifier] = Language;
 
             if (!string.IsNullOrEmpty(AccessToken))
             {
                 ExtractRolesFromToken(AccessToken);
 
                 List<Claim> claims = ExtractClaimsFromToken(AccessToken);
-                CurrentUserId = GetClaimValue<int>(claims, "user_id");
-                CurrentUserGuid = GetClaimValue<string>(claims, "user_guid") ?? string.Empty;
-                CurrentUsername = GetClaimValue<string>(claims, "username") ?? string.Empty;
+                CurrentUserGuid = GetClaimValue<string>(claims, ClaimConstants.UserIdentifier) ?? string.Empty;
+                TokenValidityKey = GetClaimValue<string>(claims, ClaimConstants.TokenValidityKey) ?? string.Empty;
+                CurrentUsername = GetClaimValue<string>(claims, ClaimConstants.Username) ?? string.Empty;
             }
-
-            ApiKey = context.Request.Headers[CustomHeader.ApiKey];
+            ApiKey = configuration.GetConfigHelper(ClaimConstants.ApiKey);
         }
 
         internal MAuthenticateInfoContext(IAmqpContext amqpContext)
         {
             CorrelationId = amqpContext.GetHeaderByKey(CustomHeader.CorrelationId) ?? Guid.NewGuid().ToString();
-            _ = int.TryParse(amqpContext.GetHeaderByKey("user_id"), out int result);
-            CurrentUserId = result;
-
-            CurrentUserGuid = amqpContext.GetHeaderByKey("user_guid") ?? string.Empty;
-            CurrentUsername = amqpContext.GetHeaderByKey("username");
-            AccessToken = amqpContext.GetHeaderByKey("access_token");
-            ApiKey = amqpContext.GetHeaderByKey(CustomHeader.ApiKey);
-
+            CurrentUserGuid = amqpContext.GetHeaderByKey(ClaimConstants.UserIdentifier) ?? string.Empty;
+            CurrentUsername = amqpContext.GetHeaderByKey(ClaimConstants.Username) ?? string.Empty;
+            AccessToken = amqpContext.GetHeaderByKey(ClaimConstants.AccessToken);
             if (!string.IsNullOrEmpty(AccessToken))
             {
                 ExtractRolesFromToken(AccessToken);
             }
-        }
-
-        internal bool HasRole(string roles)
-        {
-            if (string.IsNullOrEmpty(roles) || Roles == null || Roles.Count == 0)
-            {
-                return false;
-            }
-
-            string[] roleList = roles.Split(',');
-            return Roles.Intersect(roleList).Any();
         }
 
         internal static T? GetClaimValue<T>(List<Claim> claims, string claimType)
@@ -80,9 +53,7 @@
         private void ExtractRolesFromToken(string token)
         {
             List<Claim> claims = ExtractClaimsFromToken(token);
-            Roles = claims.Where(m => m.Type == ClaimTypes.Role)
-                          .Select(m => m.Value)
-                          .ToList();
+            Permission = claims.FirstOrDefault(m => m.Type == ClaimConstants.Permission)?.Value;
         }
 
         private static List<Claim> ExtractClaimsFromToken(string token)

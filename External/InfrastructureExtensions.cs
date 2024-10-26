@@ -13,7 +13,6 @@
                 string secreteKey = "")
         {
             _ = services.AddControllersWithOptions()
-                    .AddApiDocumentation<TProgram>()
                     .AddCoreServices(configuration, isSecretDefault, secreteKey, paginationConfigs, tokenConfig)
                     .AddAuthContext();
 
@@ -50,7 +49,7 @@
             return services;
         }
 
-        private static IServiceCollection AddApiDocumentation<TProgram>(this IServiceCollection services)
+        internal static IServiceCollection AddApiDocumentation<TProgram>(this IServiceCollection services)
         {
             _ = services.AddEndpointsApiExplorer()
                 .AddSwaggerGen(options =>

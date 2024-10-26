@@ -9,10 +9,9 @@
             return BCrypts.HashPassword(saltedPassword);
         }
 
-        public static bool VerifyPassword(string enteredPassword, string storedHash, string salt)
+        public static bool VerifyPassword(string enteredPassword, string storedHash)
         {
-            string saltedPassword = enteredPassword + salt;
-            return BCrypts.Verify(saltedPassword, storedHash);
+            return BCrypts.Verify(enteredPassword, storedHash);
         }
     }
 }

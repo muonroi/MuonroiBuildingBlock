@@ -9,7 +9,7 @@
         {
             MResponse<object> result = new();
             MUser? user = await dbContext.Users.FirstOrDefaultAsync(x => x.UserName == command.Username);
-            if (user == null || string.IsNullOrEmpty(user.Salt) || !MPasswordHelper.VerifyPassword(command.Password, user.Password, user.Salt))
+            if (user == null || string.IsNullOrEmpty(user.Salt) || !MPasswordHelper.VerifyPassword(command.Password, user.Password))
             {
                 result.AddApiErrorMessage(nameof(SystemEnum.InvalidCredentials), [command.Username]);
                 return result.GetActionResult();
@@ -190,7 +190,7 @@
         {
             DateTime refreshExpirationTime = DateTime.UtcNow.AddMinutes(525960);
 
-            MUserModel userModel = new(user.EntityId.ToString(), user.UserName, [user.Name]);
+            MUserModel userModel = new(user.EntityId.ToString(), user.UserName);
 
             accessToken = tokenHelper.GenerateAuthenticateToken(userModel, permissions, DateTime.UtcNow.AddMinutes(15));
 

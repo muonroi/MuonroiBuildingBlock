@@ -8,7 +8,7 @@
 
         protected readonly DbSet<T> _dbSet;
 
-        public int? CurrentUserId => _authContext?.CurrentUserId;
+        public string? CurrentUserId => _authContext?.CurrentUserGuid;
 
         public string? CurrentUsername => _authContext?.CurrentUsername;
 

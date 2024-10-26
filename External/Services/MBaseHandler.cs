@@ -15,13 +15,7 @@
 
         protected string CurrentUserGuid => AuthContext.CurrentUserGuid;
 
-        protected int CurrentUserId => AuthContext.CurrentUserId;
-
         protected string? CurrentUsername => AuthContext.CurrentUsername;
-
-        protected string UserId => AuthContext.UserId;
-
-        protected List<string> Roles => AuthContext.Roles;
 
         protected void LogInformation(string message, params object[] args)
         {

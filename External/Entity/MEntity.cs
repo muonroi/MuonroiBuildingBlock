@@ -81,56 +81,35 @@
         public virtual Guid EntityId { get; set; }
 
         [Column(Order = 101)]
-        public int? CreatedUserId { get; set; }
-
-        [Column(Order = 102)]
-        public int? UpdatedUserId { get; set; }
-
-        [Column(Order = 103)]
-        public int? DeletedUserId { get; set; }
-
-        [Column(Order = 104)]
-        [MaxLength(100)]
-        public string? CreatedUserName { get; set; }
-
-        [Column(Order = 105)]
-        [MaxLength(100)]
-        public string? UpdatedUserName { get; set; }
-
-        [Column(Order = 106)]
-        [MaxLength(100)]
-        public string? DeletedUserName { get; set; }
-
-        [Column(Order = 107)]
         public double CreatedDateTS { get; set; }
 
-        [Column(Order = 108)]
+        [Column(Order = 102)]
         public double? LastModificationTimeTs { get; set; }
 
-        [Column(Order = 109)]
+        [Column(Order = 103)]
         public double? DeletedDateTS { get; set; }
 
-        [Column(Order = 110)]
+        [Column(Order = 104)]
         [DefaultValue(false)]
         public bool IsDeleted { get; set; }
 
-        [Column(Order = 111)]
+        [Column(Order = 105)]
         public DateTime CreationTime { get; set; }
 
-        [Column(Order = 112)]
-        public int? CreatorUserId { get; set; }
+        [Column(Order = 106)]
+        public Guid CreatorUserId { get; set; }
 
-        [Column(Order = 113)]
+        [Column(Order = 107)]
         public DateTime? LastModificationTime { get; set; }
 
-        [Column(Order = 114)]
-        public int? LastModifierUserId { get; set; }
+        [Column(Order = 108)]
+        public Guid? LastModificationUserId { get; set; }
 
-        [Column(Order = 115)]
-        public int? DeleteUserId { get; set; }
-
-        [Column(Order = 116)]
+        [Column(Order = 109)]
         public DateTime? DeletionTime { get; set; }
+
+        [Column(Order = 110)]
+        public Guid? DeletedUserId { get; set; }
 
         public void AddDomainEvent(INotification eventItem)
         {

@@ -16,24 +16,19 @@ public class MAuthenticateTokenHelper<TPermission> where TPermission : Enum
         _rsa.ImportFromPem(_tokenConfig.PrivateKey.ToCharArray());
     }
 
-    public string GenerateAuthenticateToken(MUserModel user, List<TPermission> permissions, DateTime? expiresTime = null)
+    public string GenerateAuthenticateToken(MUserModel user, List<TPermission> permissions, DateTime? expiresTime = null, List<Claim>? claims = null)
     {
         try
         {
-            List<Claim> claims =
+            List<Claim> privateClaims = claims ??
             [
-                new Claim("username", user.Username),
+                new Claim(ClaimConstants.Username, user.Username),
                 new Claim(ClaimTypes.NameIdentifier, user.UserGuid),
             ];
 
             long permissionsBitmask = MPermissionExtension<TPermission>.CalculatePermissionsBitmask(permissions);
 
-            claims.Add(new Claim("Permissions", permissionsBitmask.ToString()));
-
-            foreach (string role in user.Roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+            privateClaims.Add(new Claim(ClaimConstants.Permission, permissionsBitmask.ToString()));
 
 
             RsaSecurityKey signingKey = new(_rsa);

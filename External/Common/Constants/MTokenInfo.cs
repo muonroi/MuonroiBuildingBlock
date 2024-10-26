@@ -12,6 +12,9 @@
         public virtual string Issuer { get; set; } = null!;
         public virtual string Audience { get; set; } = null!;
         public virtual int ExpiryMinutes { get; set; }
+        public int RefreshTokenTTL { get; set; }
+        public int RefreshTokenEIM { get; set; }
+
         public virtual string PublicKey { get; set; } = null!;
         public virtual string PrivateKey { get; set; } = null!;
     }

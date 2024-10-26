@@ -1,4 +1,6 @@
-﻿namespace Muonroi.BuildingBlock.External.Entity.Identity
+﻿
+
+namespace Muonroi.BuildingBlock.External.Entity.Identity
 {
     [Table("MUserLoginAttempts")]
     public class MUserLoginAttempt : MEntity
@@ -23,7 +25,7 @@
         /// <summary>
         /// User's Id, if <see cref="UserNameOrEmailAddress"/> was a valid username or email address.
         /// </summary>
-        public virtual long? UserId { get; set; }
+        public virtual Guid UserGuid { get; set; }
 
         /// <summary>
         /// User name or email address
@@ -53,15 +55,13 @@
         /// Login attempt result.
         /// </summary>
         public virtual MLoginResultType Result { get; set; }
-
-        public new virtual DateTime CreationTime { get; set; }
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="MUserLoginAttempt"/> class.
+        /// Login attempt time.
         /// </summary>
-        public MUserLoginAttempt()
-        {
-            CreationTime = Clock.Now;
-        }
+        public virtual int AttemptTime { get; set; }
+        /// <summary>
+        /// Lockout end date.
+        /// </summary>
+        public virtual DateTime LockTo { get; set; }
     }
 }

@@ -118,3 +118,7 @@ global using Module = Autofac.Module;
 global using RedisCacheProvider = Muonroi.BuildingBlock.External.Caching.Distributed.Redis.RedisCacheProvider;
 global using Type = System.Type;
 global using Microsoft.EntityFrameworkCore.Infrastructure;
+global using Microsoft.AspNetCore.Components.Web.Virtualization;
+global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using Azure.Core;
+global using Grpc.Net.ClientFactory;

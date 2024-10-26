@@ -1,7 +1,4 @@
-﻿
-
-
-namespace Muonroi.BuildingBlock.External.Extensions;
+﻿namespace Muonroi.BuildingBlock.External.Extensions;
 
 public static class MPermissionExtension<TPermission> where TPermission : Enum
 {
@@ -14,4 +11,5 @@ public static class MPermissionExtension<TPermission> where TPermission : Enum
         }
         return bitmask;
     }
+
 }

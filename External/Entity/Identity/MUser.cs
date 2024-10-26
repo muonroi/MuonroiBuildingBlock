@@ -125,7 +125,5 @@ namespace Muonroi.BuildingBlock.External.Entity.Identity
         {
             EmailConfirmationCode = Guid.NewGuid().ToString("N").Truncate(MaxEmailConfirmationCodeLength);
         }
-
-
     }
 }
