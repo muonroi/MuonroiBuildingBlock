@@ -1,4 +1,6 @@
-﻿namespace Muonroi.BuildingBlock.External
+﻿
+
+namespace Muonroi.BuildingBlock.External
 {
     public static class InfrastructureExtensions
     {
@@ -24,12 +26,11 @@
             return services;
         }
 
+
+
         private static IServiceCollection AddControllersWithOptions(this IServiceCollection services)
         {
-            _ = services.AddControllers(options =>
-            {
-                _ = options.Filters.Add<DefaultProducesResponseTypeFilter>();
-            })
+            _ = services.AddControllers()
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
@@ -100,10 +101,11 @@
             return services;
         }
 
-        public static IApplicationBuilder UseDefaultMiddleware(this IApplicationBuilder app)
+        public static IApplicationBuilder UseDefaultMiddleware<TDbContext>(this IApplicationBuilder app)
+            where TDbContext : MDbContext
         {
             // Add custom exception handling middleware
-            _ = app.UseMiddleware<MAuthenMiddleware>();
+            _ = app.UseMiddleware<MAuthenMiddleware<TDbContext>>();
             _ = app.UseMiddleware<MExceptionMiddleware>();
             return app;
         }

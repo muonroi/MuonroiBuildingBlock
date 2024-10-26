@@ -4,9 +4,8 @@
     {
         public static string HashPassword(string password, out string salt)
         {
-            salt = MSaltHelper.CreateSalt();
-            string saltedPassword = password + salt;
-            return BCrypts.HashPassword(saltedPassword);
+            salt = BCrypts.GenerateSalt(8);
+            return BCrypts.HashPassword(password, salt);
         }
 
         public static bool VerifyPassword(string enteredPassword, string storedHash)

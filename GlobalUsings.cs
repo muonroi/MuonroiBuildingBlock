@@ -122,3 +122,8 @@ global using Microsoft.AspNetCore.Components.Web.Virtualization;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Azure.Core;
 global using Grpc.Net.ClientFactory;
+global using Elastic.Transport;
+global using Muonroi.BuildingBlock.Internal.Infrastructure.Authorize;
+global using BrightFocus.Core.Models.Requests.Login;
+global using BrightFocus.Core.Models.Responses.Login;
+global using Muonroi.BuildingBlock.External.Repositories;

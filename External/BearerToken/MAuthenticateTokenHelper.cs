@@ -23,7 +23,8 @@ public class MAuthenticateTokenHelper<TPermission> where TPermission : Enum
             List<Claim> privateClaims = claims ??
             [
                 new Claim(ClaimConstants.Username, user.Username),
-                new Claim(ClaimTypes.NameIdentifier, user.UserGuid),
+                new Claim(ClaimConstants.UserIdentifier, user.UserGuid),
+                new Claim(ClaimConstants.TokenValidityKey, user.TokenValidity),
             ];
 
             long permissionsBitmask = MPermissionExtension<TPermission>.CalculatePermissionsBitmask(permissions);
@@ -38,7 +39,7 @@ public class MAuthenticateTokenHelper<TPermission> where TPermission : Enum
             {
                 Issuer = _tokenConfig.Issuer,
                 Audience = _tokenConfig.Audience,
-                Subject = new ClaimsIdentity(claims),
+                Subject = new ClaimsIdentity(privateClaims),
                 Expires = expiresTime ?? DateTime.UtcNow.AddMinutes(_tokenConfig.ExpiryMinutes),
                 SigningCredentials = credentials
             };

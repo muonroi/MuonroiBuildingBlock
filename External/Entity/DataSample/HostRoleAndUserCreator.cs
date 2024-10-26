@@ -45,11 +45,11 @@
                     Name = "Admin",
                     Surname = "User",
                     EmailAddress = "admin@muonroi.com",
-                    Password = "$2b$10$RzNp23ti9B/GxTfmNL.Ypeb.D2nELhnjUq5BTNoyQb8elzhVd.mHi", //123qWE!@#,
+                    Password = "$2b$08$OT6ZsF1WkYzf8e6R9kwP8uVxLbKaff/jkGgarg42LUbtCcTAbBr3.", //123qWE,
                     IsEmailConfirmed = true,
                     ShouldChangePasswordOnNextLogin = false,
                     IsActive = true,
-                    Salt = "z6Iw1m+Rmlx537KBLdU4lNCu1L/bihRe",
+                    Salt = "$2b$08$OT6ZsF1WkYzf8e6R9kwP8u",
                     CreationTime = DateTime.UtcNow
                 };
 

@@ -1,35 +1,8 @@
 ﻿namespace Muonroi.BuildingBlock.External.Controller
 {
-    public class MAuthControllerBase<TPermission>(MDbContext dbContext, MAuthenticateTokenHelper<TPermission> tokenHelper) : ControllerBase
+    public class MAuthControllerBase<TPermission>(MDbContext dbContext) : ControllerBase
         where TPermission : Enum
     {
-        [HttpPost("login")]
-        [AllowAnonymous]
-        public virtual async Task<IActionResult> Login([FromBody] LoginRequestModel command)
-        {
-            MResponse<object> result = new();
-            MUser? user = await dbContext.Users.FirstOrDefaultAsync(x => x.UserName == command.Username);
-            if (user == null || string.IsNullOrEmpty(user.Salt) || !MPasswordHelper.VerifyPassword(command.Password, user.Password))
-            {
-                result.AddApiErrorMessage(nameof(SystemEnum.InvalidCredentials), [command.Username]);
-                return result.GetActionResult();
-            }
-
-            List<TPermission> permissions = await GetPermissionsOfUser(user.Id);
-            GenerateToken(user, permissions, out string accessToken, out string refreshToken, out MUserToken loginToken);
-
-            result.Result = new
-            {
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
-            };
-
-            _ = await dbContext.AddAsync(loginToken);
-            _ = await dbContext.SaveChangesAsync();
-
-            return result.GetActionResult();
-        }
-
         [HttpPost("create-role")]
         public virtual async Task<IActionResult> CreateRole([FromBody] CreateRoleRequestModel request)
         {
@@ -184,19 +157,6 @@
 
             result.Result = users;
             return result.GetActionResult();
-        }
-
-        private void GenerateToken(MUser user, List<TPermission> permissions, out string accessToken, out string refreshToken, out MUserToken loginToken)
-        {
-            DateTime refreshExpirationTime = DateTime.UtcNow.AddMinutes(525960);
-
-            MUserModel userModel = new(user.EntityId.ToString(), user.UserName);
-
-            accessToken = tokenHelper.GenerateAuthenticateToken(userModel, permissions, DateTime.UtcNow.AddMinutes(15));
-
-            refreshToken = Guid.NewGuid().ToString();
-
-            loginToken = new(user.Id, "System", "RefreshToken", accessToken, refreshExpirationTime);
         }
 
         private async Task<List<TPermission>> GetPermissionsOfUser(long userId)

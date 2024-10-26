@@ -35,6 +35,14 @@
         /// <summary>
         /// User has no permissions.
         /// </summary>
-        UserHasNoPermissions = 6
+        UserHasNoPermissions = 6,
+        /// <summary>
+        /// Account is locked. Try again in {0} minutes.
+        /// </summary>
+        AccountIsLocked,
+        /// <summary>
+        /// Invalid login information.
+        /// </summary>
+        InvalidLoginInfo
     }
 }
