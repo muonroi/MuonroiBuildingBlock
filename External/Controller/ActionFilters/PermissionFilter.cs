@@ -43,7 +43,7 @@
 
         private static long? GetPermissionsFromToken(ClaimsPrincipal userClaims)
         {
-            string? permissionClaim = userClaims.FindFirst("Permissions")?.Value;
+            string? permissionClaim = userClaims.FindFirst(ClaimConstants.Permission)?.Value;
 
             return long.TryParse(permissionClaim, out long permissionsBitmask) ? permissionsBitmask : null;
         }
