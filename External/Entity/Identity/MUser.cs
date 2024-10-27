@@ -5,15 +5,14 @@ namespace Muonroi.BuildingBlock.External.Entity.Identity
     [Table("MUsers")]
     public class MUser : MEntity
     {
+        public const int MaxConcurrencyStampLength = 128;
+
         public MUser()
         {
-            IsLockoutEnabled = true;
-            IsTwoFactorEnabled = true;
+            IsTwoFactorEnabled = false;
             IsActive = true;
             SecurityStamp = MSequentialGuidGenerator.Instance.Create().ToString();
         }
-
-        public const int MaxConcurrencyStampLength = 128;
 
         private string _userName = string.Empty;
 
@@ -58,15 +57,7 @@ namespace Muonroi.BuildingBlock.External.Entity.Identity
         [StringLength(MaxPasswordLength)]
         public virtual string Password { get; set; } = string.Empty;
 
-        [StringLength(MaxEmailConfirmationCodeLength)]
-        public virtual string? EmailConfirmationCode { get; set; }
-
-        [StringLength(MaxPasswordResetCodeLength)]
         public virtual string? PasswordResetCode { get; set; }
-
-        public virtual DateTime? LockoutEndDateUtc { get; set; }
-        public virtual int AccessFailedCount { get; set; }
-        public virtual bool IsLockoutEnabled { get; set; }
 
         [StringLength(MaxPhoneNumberLength)]
         public virtual string PhoneNumber { get; set; } = string.Empty;
@@ -77,7 +68,9 @@ namespace Muonroi.BuildingBlock.External.Entity.Identity
         public virtual string? SecurityStamp { get; set; }
 
         public virtual bool IsTwoFactorEnabled { get; set; }
+
         public virtual bool IsEmailConfirmed { get; set; }
+
         public virtual bool IsActive { get; set; }
 
         [Required]
@@ -97,33 +90,10 @@ namespace Muonroi.BuildingBlock.External.Entity.Identity
 
         public virtual bool ShouldChangePasswordOnNextLogin { get; set; }
         public virtual DateTime? SignInTokenExpireTimeUtc { get; set; }
-        public virtual string? SignInToken { get; set; }
-        public virtual string? GoogleAuthenticatorKey { get; set; }
-        public virtual string? RecoveryCode { get; set; }
-
-        [StringLength(MaxAuthenticationSourceLength)]
-        public virtual string? AuthenticationSource { get; set; }
 
         public virtual void SetNewPasswordResetCode()
         {
             PasswordResetCode = Guid.NewGuid().ToString("N").Truncate(10)?.ToUpperInvariant();
-        }
-
-        public virtual void Unlock()
-        {
-            AccessFailedCount = 0;
-            LockoutEndDateUtc = null;
-        }
-
-        public virtual void SetSignInToken()
-        {
-            SignInToken = Guid.NewGuid().ToString();
-            SignInTokenExpireTimeUtc = Clock.UtcNow.AddMinutes(1).ToUniversalTime();
-        }
-
-        public virtual void SetNewEmailConfirmationCode()
-        {
-            EmailConfirmationCode = Guid.NewGuid().ToString("N").Truncate(MaxEmailConfirmationCodeLength);
         }
     }
 }

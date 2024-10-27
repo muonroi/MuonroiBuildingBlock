@@ -43,6 +43,22 @@
         /// <summary>
         /// Invalid login information.
         /// </summary>
-        InvalidLoginInfo
+        InvalidLoginInfo,
+        /// <summary>
+        /// User already exists.
+        /// </summary>
+        UserAlreadyExists,
+        /// <summary>
+        /// User already has role.
+        /// </summary>
+        UserAlreadyHasRole,
+        /// <summary>
+        /// User does not have role.
+        /// </summary>
+        RoleAlreadyHasPermission,
+        /// <summary>
+        /// Role does not have permission.
+        /// </summary>
+        RolePermissionNotFound
     }
 }

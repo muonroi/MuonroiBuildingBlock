@@ -7,7 +7,7 @@
         [StringLength(MaxNameLength)]
         public virtual string Name { get; set; } = string.Empty;
 
-        public virtual bool IsGranted { get; set; } = true;
+        public virtual bool IsGranted { get; set; }
 
         [StringLength(255)]
         public virtual string Discriminator { get; set; } = string.Empty;

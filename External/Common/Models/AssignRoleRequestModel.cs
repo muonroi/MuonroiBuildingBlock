@@ -1,8 +1,8 @@
 ﻿namespace Muonroi.BuildingBlock.External.Common.Models
 {
-    public class AssignPermissionRequestModel
+    public class AssignRoleRequestModel
     {
         public Guid RoleId { get; set; }
-        public Guid PermissionId { get; set; }
+        public Guid UserId { get; set; }
     }
 }

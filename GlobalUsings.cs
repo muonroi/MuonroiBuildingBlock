@@ -125,3 +125,5 @@ global using JsonIgnoreAttribute = System.Text.Json.Serialization.JsonIgnoreAttr
 global using Module = Autofac.Module;
 global using RedisCacheProvider = Muonroi.BuildingBlock.External.Caching.Distributed.Redis.RedisCacheProvider;
 global using Type = System.Type;
+global using Muonroi.BuildingBlock.External.Common.Models.Requests.Registers;
+global using AutoMapper;

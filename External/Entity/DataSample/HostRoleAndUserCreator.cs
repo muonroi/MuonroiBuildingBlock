@@ -56,15 +56,6 @@
                 adminUserForHost = context.Users.Add(user).Entity;
                 _ = context.SaveChanges();
 
-                _ = context.UserAccounts.Add(new MUserAccount
-                {
-                    UserId = adminUserForHost.Id,
-                    UserName = StaticRoleAndUserNames.Host.AdminUserName,
-                    EmailAddress = adminUserForHost.EmailAddress,
-                    CreatedDateTS = DateTime.UtcNow.GetTimeStamp()
-                });
-
-                _ = context.SaveChanges();
             }
         }
 

@@ -12,13 +12,11 @@ namespace Muonroi.BuildingBlock.External.Entity
 
         public DbSet<MRolePermission> RolePermissions { get; set; }
         public DbSet<MRefreshToken> RefreshTokens { get; set; }
-        public DbSet<MUserAccount> UserAccounts { get; set; }
         public DbSet<MUser> Users { get; set; }
         public DbSet<MRole> Roles { get; set; }
         public DbSet<MPermission> Permissions { get; set; }
         public DbSet<MUserRole> UserRoles { get; set; }
         public DbSet<MLanguage> Languages { get; set; }
-        public DbSet<MUserLogin> UserLogins { get; set; }
         public DbSet<MUserToken> UserTokens { get; set; }
         public DbSet<MUserLoginAttempt> MUserLoginAttempts { get; set; }
 
@@ -207,8 +205,6 @@ namespace Muonroi.BuildingBlock.External.Entity
             CustomColumnOrderConvention customConvention = new();
             customConvention.Customize(builder, this);
             _ = builder.ApplyConfiguration(new MUserConfiguration());
-            _ = builder.ApplyConfiguration(new MUserAccountConfiguration());
-            _ = builder.ApplyConfiguration(new MUserLoginConfiguration());
             _ = builder.ApplyConfiguration(new MUserRoleConfiguration());
             _ = builder.ApplyConfiguration(new MLanguageConfiguration());
             _ = builder.ApplyConfiguration(new MPermissionConfiguration());

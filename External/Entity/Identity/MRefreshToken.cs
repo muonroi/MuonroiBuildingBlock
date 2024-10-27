@@ -13,6 +13,6 @@
 
         public string ReasonRevoked { get; set; } = string.Empty;
 
-        public bool IsRevoked { get; set; } = false;
+        public bool IsRevoked { get; set; }
     }
 }
