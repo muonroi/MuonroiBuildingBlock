@@ -33,10 +33,9 @@ namespace Muonroi.BuildingBlock.External.Repositories
                 return result;
             }
 
-            result = await AuthorizeInternal<TDbContext, TPermission>.ResolveLoginAsync(request,
+            result = await _dbContext.ResolveLoginAsync(request,
                 result,
                 existedUser,
-                _dbContext,
                 mTokenInfo,
                 tokenHelper,
                 cancellationToken);
@@ -58,7 +57,7 @@ namespace Muonroi.BuildingBlock.External.Repositories
                 return result;
             }
 
-            result = await AuthorizeInternal<TDbContext,TPermission>.ResolveRefreshToken(request, result, existedUser,_dbContext,mTokenInfo,cancellationToken);
+            result = await _dbContext.ResolveRefreshToken<TDbContext, TPermission>(request, result, existedUser, mTokenInfo, cancellationToken);
 
             return result;
 

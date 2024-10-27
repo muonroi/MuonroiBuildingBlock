@@ -18,7 +18,7 @@ namespace Muonroi.BuildingBlock.External.Middleware
             {
                 context.Request.Headers.Authorization = $"Bearer {authorizationHeader}";
 
-                await AuthorizeInternal<TDbContext, TPermission>.ResolveTokenValidityKey(authorizationHeader, _dbContext, context);
+                await _dbContext.ResolveTokenValidityKey<TDbContext, TPermission>(authorizationHeader, context);
             }
             await _next(context);
         }

@@ -2,13 +2,12 @@
 
 namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
 {
-    public static class AuthorizeInternal<TDbContext, TPermission>
+    public static class AuthorizeInternal
+    {
+        internal static async Task ResolveTokenValidityKey<TDbContext, TPermission>(this TDbContext dbContext, string authorizationHeader,
+           HttpContext context)
         where TDbContext : MDbContext
         where TPermission : Enum
-    {
-        internal static async Task ResolveTokenValidityKey(string authorizationHeader,
-           TDbContext dbContext,
-           HttpContext context)
         {
             List<Claim> claims = ExtractClaimsFromToken(authorizationHeader);
 
@@ -38,13 +37,14 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
             return jwtToken.Claims.ToList();
         }
 
-        internal static async Task<MResponse<LoginResponseModel>> ResolveLoginAsync(LoginRequestModel request,
+        internal static async Task<MResponse<LoginResponseModel>> ResolveLoginAsync<TDbContext, TPermission>(this TDbContext dbContext, LoginRequestModel request,
             MResponse<LoginResponseModel> result,
             MUser existedUser,
-            TDbContext dbContext,
             MTokenInfo mTokenInfo,
             MAuthenticateTokenHelper<TPermission> tokenHelper,
             CancellationToken cancellationToken)
+        where TDbContext : MDbContext
+        where TPermission : Enum
         {
             MUserLoginAttempt? loginAttemptHistory = await dbContext.MUserLoginAttempts
                            .FirstOrDefaultAsync(x => x.UserGuid == existedUser.EntityId, cancellationToken);
@@ -68,7 +68,7 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
             }
 
 
-            List<TPermission> permissions = await GetPermissionsOfUser(existedUser!.Id, dbContext);
+            List<TPermission> permissions = await GetPermissionsOfUser<TDbContext, TPermission>(existedUser!.Id, dbContext);
 
             GenerateAccessToken(existedUser, permissions, out string accessToken, out string tokenValidate, mTokenInfo, tokenHelper);
 
@@ -79,13 +79,15 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
             await ResetLoginAttemptOnSuccess(existedUser, loginAttemptHistory, dbContext, cancellationToken);
             return result;
         }
-        internal static async Task<MResponse<RefreshTokenResponseModel>> ResolveRefreshToken(
+        internal static async Task<MResponse<RefreshTokenResponseModel>> ResolveRefreshToken<TDbContext, TPermission>(
+            this TDbContext dbContext,
             RefreshTokenRequestModel request,
             MResponse<RefreshTokenResponseModel> result,
              MUser existedUser,
-            TDbContext dbContext,
             MTokenInfo mTokenInfo,
             CancellationToken cancellationToken)
+            where TDbContext : MDbContext
+            where TPermission : Enum
         {
             ClaimsPrincipal principal = GetPrincipalFromExpiredToken(request.AccessToken, out string message, mTokenInfo);
 
@@ -123,7 +125,7 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
                 claims.Add(new(ClaimConstants.TokenValidityKey, tokenValidityKey));
             }
 
-            _ = await GetPermissionsOfUser(existedUser!.Id, dbContext);
+            _ = await GetPermissionsOfUser<TDbContext, TPermission>(existedUser!.Id, dbContext);
 
             GenerateAccessToken(claims, out string newAccessToken, mTokenInfo);
             GenerateRefreshToken(out string newRefreshToken);
@@ -139,8 +141,9 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
         }
 
 
-        private static async Task HandleFailedLoginAttempt(MUser existedUser, MUserLoginAttempt? loginAttemptHistory, TDbContext dbContext,
+        private static async Task HandleFailedLoginAttempt<TDbContext>(MUser existedUser, MUserLoginAttempt? loginAttemptHistory, TDbContext dbContext,
             CancellationToken cancellationToken)
+            where TDbContext : MDbContext
         {
             MUserLoginAttempt loginAttempt = loginAttemptHistory ?? new MUserLoginAttempt
             {
@@ -211,7 +214,8 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
                 return new ClaimsPrincipal();
             }
         }//
-        private static async Task RevokeRefreshToken(MRefreshToken token, Guid userId, TDbContext dbContext, string reason = "")
+        private static async Task RevokeRefreshToken<TDbContext>(MRefreshToken token, Guid userId, TDbContext dbContext, string reason = "")
+            where TDbContext : MDbContext
         {
             token.RevokedDate = Clock.UtcNow;
             token.ReasonRevoked = reason;
@@ -222,13 +226,14 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
             _ = await dbContext.SaveChangesAsync();
         }
 
-        private static async Task<LoginResponseModel> GenerateLoginReply(string accessToken,
+        private static async Task<LoginResponseModel> GenerateLoginReply<TDbContext>(string accessToken,
             string refreshToken,
             MUser existedUser,
             string tokenValidate,
             MTokenInfo mTokenInfo,
             TDbContext dbContext
             )
+            where TDbContext : MDbContext
         {
 
             LoginResponseModel loginReply = new()
@@ -264,8 +269,9 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
             return false;
         }
 
-        private static async Task ResetLoginAttemptOnSuccess(MUser existedUser, MUserLoginAttempt? loginAttemptHistory,
+        private static async Task ResetLoginAttemptOnSuccess<TDbContext>(MUser existedUser, MUserLoginAttempt? loginAttemptHistory,
            TDbContext dbContext, CancellationToken cancellationToken)
+            where TDbContext : MDbContext
         {
             if (loginAttemptHistory != null)
             {
@@ -283,8 +289,10 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
             _ = await dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        private static async Task<List<TPermission>> GetPermissionsOfUser(long userId,
+        private static async Task<List<TPermission>> GetPermissionsOfUser<TDbContext, TPermission>(long userId,
            TDbContext dbContext)
+              where TDbContext : MDbContext
+              where TPermission : Enum
         {
             List<string> permissionNames = await (from user in dbContext.Set<MUser>()
                                                   join userRole in dbContext.Set<MUserRole>() on user.EntityId equals userRole.UserId
@@ -297,12 +305,13 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
         }
 
 
-        private static void GenerateAccessToken(MUser user,
+        private static void GenerateAccessToken<TPermission>(MUser user,
             List<TPermission> permissions,
             out string accessToken,
             out string tokenValidityKey,
             MTokenInfo mTokenInfo,
             MAuthenticateTokenHelper<TPermission> tokenHelper)
+            where TPermission : Enum
         {
             tokenValidityKey = Guid.NewGuid().ToString();
 
@@ -333,8 +342,9 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
             accessToken = new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private static async Task SaveRefreshToken(string refreshToken,
+        private static async Task SaveRefreshToken<TDbContext>(string refreshToken,
            TDbContext dbContext, Guid userId, string tokenValidityKey, MTokenInfo mTokenInfo)
+              where TDbContext : MDbContext
         {
             MRefreshToken token = new()
             {
@@ -349,8 +359,9 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
             _ = await dbContext.RefreshTokens.AddAsync(token);
             _ = await dbContext.SaveChangesAsync();
         }
-        private static async Task RemoveOldRefreshTokensByUser(Guid userId,
+        private static async Task RemoveOldRefreshTokensByUser<TDbContext>(Guid userId,
            TDbContext dbContext, MTokenInfo mTokenInfo)
+                where TDbContext : MDbContext
         {
             List<MRefreshToken> tokensToDelete = [.. dbContext.RefreshTokens
             .Where(rt =>

@@ -14,9 +14,9 @@
     <PackageReleaseNotes>This library will help you whenever you create a new project without needing much configuration, as everything is already set up, from bearer tokens to authentication, and more.</PackageReleaseNotes>
     <PackAsTool>False</PackAsTool>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <AssemblyVersion>1.2.5</AssemblyVersion>
-    <Version>1.2.5</Version>
-    <FileVersion>1.2.5</FileVersion>
+    <AssemblyVersion>1.2.6</AssemblyVersion>
+    <Version>1.2.6</Version>
+    <FileVersion>1.2.6</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
