@@ -15,6 +15,8 @@ namespace Muonroi.BuildingBlock.External
                 return;
             }
 
+            IsAuthenticated = context.Items[nameof(IsAuthenticated)] is bool isAuthenticated && isAuthenticated;
+
             CorrelationId = context.Request.Headers[CustomHeader.CorrelationId].FirstOrDefault() ?? Guid.NewGuid().ToString();
             AccessToken = context.Request.Headers.Authorization;
             Language = context.Request.Headers.AcceptLanguage.ToString().Split(',').FirstOrDefault() ?? "vi-VN";

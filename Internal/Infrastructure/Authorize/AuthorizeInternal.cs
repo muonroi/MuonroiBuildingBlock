@@ -13,8 +13,6 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
 
             string tokenValidity = GetClaimValue<string>(claims, ClaimConstants.TokenValidityKey) ?? string.Empty;
 
-            string userIdentifier = GetClaimValue<string>(claims, ClaimConstants.UserIdentifier) ?? string.Empty;
-
             MRefreshToken? refresh = await dbContext.RefreshTokens.SingleOrDefaultAsync(x =>
                                             x.TokenValidityKey == tokenValidity);
 
@@ -24,6 +22,7 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
                 await context.Response.WriteAsync("Unauthorized: Invalid token.");
                 return;
             }
+            context.Items.Add(nameof(MAuthenticateInfoContext.IsAuthenticated), true);
         }
         private static T? GetClaimValue<T>(List<Claim> claims, string claimType)
         {

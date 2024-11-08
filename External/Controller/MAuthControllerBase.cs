@@ -1,5 +1,7 @@
 ﻿namespace Muonroi.BuildingBlock.External.Controller
 {
+    [ApiController]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class MAuthControllerBase<TPermission>(MDbContext dbContext,
         MAuthenticateInfoContext context,
         IAuthenticateRepository authenticateRepository) : ControllerBase

@@ -1,6 +1,6 @@
 ﻿namespace Muonroi.BuildingBlock.External.Middleware
 {
-    public class JwtAdminMiddleware(
+    public class JwtMiddleware(
         RequestDelegate next,
         Func<IServiceProvider, HttpContext, Task<MAuthenticateInfoContext>> callbackVerifyToken)
     {

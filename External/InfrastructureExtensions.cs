@@ -61,6 +61,13 @@ namespace Muonroi.BuildingBlock.External
                     options.IncludeXmlComments(filePath);
                 });
 
+            _ = services.AddApiVersioning(options =>
+            {
+                options.ReportApiVersions = true;
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+            });
+
             return services;
         }
 
@@ -133,7 +140,6 @@ namespace Muonroi.BuildingBlock.External
 
             // Map default routes and controllers
             _ = app.MapControllers();
-            _ = app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
             // Redirect root URL to Swagger UI
             _ = app.MapGet("/", context =>
@@ -145,7 +151,8 @@ namespace Muonroi.BuildingBlock.External
             return app;
         }
 
-        public static IServiceCollection AddValidateBearerToken<T, TPermission>(this IServiceCollection services, IConfiguration configuration, string policyUrl = "policy.html")
+        public static IServiceCollection AddValidateBearerToken<T, TPermission>(this IServiceCollection services,
+            IConfiguration configuration, string policyUrl = "policy.html")
             where T : MTokenInfo, new()
             where TPermission : Enum
         {
