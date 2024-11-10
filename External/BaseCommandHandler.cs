@@ -7,8 +7,13 @@ namespace Muonroi.BuildingBlock.External
         MAuthenticateInfoContext tokenInfo,
         IAuthenticateRepository authenticateRepository,
         ILogger logger,
-        IMediator mediator)
+        IMediator mediator,
+        MPaginationConfig paginationConfig)
     {
+        protected MPaginationConfig PaginationConfig => paginationConfig;
+        protected int DefaultPageIndex => paginationConfig.DefaultPageIndex;
+        protected int DefaultPageSize => paginationConfig.DefaultPageSize;
+        protected int MaxPageSize => paginationConfig.MaxPageSize;
         protected IMapper Mapper => mapper;
         protected IAuthenticateRepository AuthenticateRepository => authenticateRepository;
         protected ILogger Logger => logger;
