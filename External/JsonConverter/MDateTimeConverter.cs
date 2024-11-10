@@ -1,7 +1,7 @@
 ﻿namespace Muonroi.BuildingBlock.External.JsonConverter
 {
     public class MDateTimeConverter
-   : JsonConverter<DateTime>
+   : System.Text.Json.Serialization.JsonConverter<DateTime>
     {
         public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
