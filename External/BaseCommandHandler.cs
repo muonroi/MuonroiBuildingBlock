@@ -2,7 +2,7 @@
 
 namespace Muonroi.BuildingBlock.External
 {
-    internal abstract class BaseCommandHandler(
+    public abstract class BaseCommandHandler(
         IMapper mapper,
         MAuthenticateInfoContext tokenInfo,
         IAuthenticateRepository authenticateRepository,
@@ -13,7 +13,6 @@ namespace Muonroi.BuildingBlock.External
         protected IAuthenticateRepository AuthenticateRepository => authenticateRepository;
         protected ILogger Logger => logger;
         protected IMediator Mediator => mediator;
-
         protected string CurrentUserId => tokenInfo.CurrentUserGuid;
         protected string CurrentUsername => tokenInfo.CurrentUsername;
         protected static double NowTsOnlyDay => Clock.UtcNow.GetTimeStamp();
