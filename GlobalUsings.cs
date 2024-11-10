@@ -129,3 +129,4 @@ global using Module = Autofac.Module;
 global using RedisCacheProvider = Muonroi.BuildingBlock.External.Caching.Distributed.Redis.RedisCacheProvider;
 global using Type = System.Type;
 global using JsonSerializer = System.Text.Json.JsonSerializer;
+global using Muonroi.BuildingBlock.External.DI;

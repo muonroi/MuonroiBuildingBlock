@@ -1,4 +1,6 @@
-﻿namespace Muonroi.BuildingBlock.External
+﻿
+
+namespace Muonroi.BuildingBlock.External
 {
     public static class ApplicationExtensions
     {
@@ -22,6 +24,7 @@
             {
                 _ = services.AddControllerConfiguration(firstAssembly);
             }
+
 
             return services;
         }
