@@ -30,8 +30,6 @@ namespace Muonroi.BuildingBlock.External.Entity
             }
             _ = services.AddScoped(typeof(IPermissionSyncService), typeof(PermissionSyncService<TDbContext>));
 
-            _ = services.AddAutoMapper(cfg => cfg.AddProfile(new ConfigurationAutoMapperProfiles(typeof(TDbContext).Assembly)));
-
             services.SystemDependencyInjectionService<TDbContext, TPermission>();
 
             return services;
