@@ -11,71 +11,56 @@ This library provides entities such as `User`, `Role`, `Permission`, and `Langua
 Here's how to configure your `Program.cs` file:
 
 ```csharp
-using Serilog;
-using Autofac;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .CreateBootstrapLogger();
+
+
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+Assembly assembly = Assembly.GetExecutingAssembly();
+ConfigurationManager configuration = builder.Configuration;
 
-// Add application configurations
-_ = builder.AddAppConfigurations();
-
-// Add Autofac configuration
-_ = builder.AddAutofacConfiguration();
-
-// Configure Serilog
-_ = builder.Host.UseSerilog(MSerilogAction.Configure);
+builder.AddAppConfigurations();
+builder.AddAutofacConfiguration();
+builder.Host.UseSerilog((context, services, loggerConfiguration) =>
+{
+    MSerilogAction.Configure(context, services, loggerConfiguration, false);
+});
 
 Log.Information("Starting {ApplicationName} API up", builder.Environment.ApplicationName);
 
 try
 {
-    IConfiguration configuration = builder.Configuration;
-    Assembly assembly = Assembly.GetExecutingAssembly();
     IServiceCollection services = builder.Services;
 
-    // Add services to DI container
+    // Register services
     _ = services.AddApplication(assembly);
-    _ = services.AddInfrastructure(configuration);
-    _ = services.AddDbContextConfigure<ApiDbContext>(configuration);
+    _ = services.AddInfrastructure<Program>(configuration);
     _ = services.SwaggerConfig(builder.Environment.ApplicationName);
-    _ = services.AddScopeServices(typeof(ApiDbContext).Assembly);
-    _ = services.AddValidateBearerToken<MTokenInfo>();
-
+    _ = services.AddScopeServices(typeof(<Your Db context>).Assembly);
+    _ = services.AddValidateBearerToken<MTokenInfo, <Your Enum permission>>(configuration);
+    _ = services.AddDbContextConfigure<<Your Db context>, <Your Enum permission>>(configuration);
+    _ = services.AddCors(configuration);
+    _ = services.AddPermissionFilter<<Your Enum permission>>();
+    _ = services.ConfigureMapper();
     WebApplication app = builder.Build();
-
-    // Add localization and middleware
+    _ = app.UseCors("MAllowDomains");
+    _ = app.UseDefaultMiddleware<<Your Db context>, <Your Enum permission>>();
     _ = app.AddLocalization(assembly);
     _ = app.UseRouting();
     _ = app.UseAuthentication();
     _ = app.UseAuthorization();
     _ = app.ConfigureEndpoints();
-    _ = app.MigrateDatabase();
-    _ = app.UseMiddleware<MExceptionMiddleware>();
+    _ = app.MigrateDatabase<<Your Db context>>();
 
     await app.RunAsync();
 }
 catch (Exception ex)
 {
-    string type = ex.GetType().Name;
-
-    if (type.Equals("StopTheHostException", StringComparison.Ordinal))
-    {
-        throw;
-    }
-
-    Log.Fatal(ex, "Unhandled exception: ", ex.Message);
+    Log.Fatal(ex, "Unhandled exception: {Message}", ex.Message);
 }
 finally
 {
-    Log.Information("Shut down ", builder.Environment.ApplicationName + " complete");
+    Log.Information("Shut down {ApplicationName} complete", builder.Environment.ApplicationName);
     await Log.CloseAndFlushAsync();
 }
 ```
@@ -86,10 +71,26 @@ Here's an example of the `appsettings.json` configuration that can be used with 
 
 ```json
 {
-  "ConnectionStrings": {
-    "DefaultConnection": ""
+  "DatabaseConfigs": {
+    "DbType": "Sqlite",
+    "ConnectionStrings": {
+      "SqliteConnectionString": "Your encrypt connection string by serect key",
+      "MongoDbConnectionString": "Your encrypt connection string by serect key",
+      "SqlServerConnectionString": "Your encrypt connection string by serect key",
+      "MySqlConnectionString": "Your encrypt connection string by serect key",
+      "PostgreSqlConnectionString": "Your encrypt connection string by serect key"
+    }
   },
   "ApiKey": "",
+    "RedisConfigs": {
+    "Enable": true,
+    "Host": "Your encrypt by serect key",
+    "Port": "Your encrypt by serect key",
+    "Password": "Your encrypt by serect key",
+    "Expire": 30,
+    "KeyPrefix": "Your encrypt by serect key",
+    "AllMethodsEnableCache": false
+  },
   "TokenConfigs": {
     "Issuer": "https://exampledomain.com",
     "Audience": "https://searchpartners.exampledomain.com",
@@ -118,6 +119,32 @@ Here's an example of the `appsettings.json` configuration that can be used with 
         "System": "Warning"
       }
     },
+    "MAllowDomains": "https://localhost:52182,http://localhost:4200",
+    "GrpcServices": {
+    "Services": {
+      "Your service 1": {
+        "Uri": "Your service url"
+      },
+      "Your service 2": {
+        "Uri": "Your service url"
+      },
+      "Your service 3": {
+        "Uri": "Your service url"
+      }
+    }
+  },
+    "ConsulConfigs": {
+    "ServiceName": "MyService",
+    "ConsulAddress": "Your service url",
+    "ServiceAddress": "http://localhost",
+    "ServicePort": 5000,
+    "ServiceMetadata": {
+      "version": "1.0.0",
+      "environment": "production"
+    }
+  },
+  ApiKey: "Your api key use with grpc",
+    "SecretKey": "Your serect key use encrypt impotant value",
     "WriteTo": [
       {
         "Name": "Console"
