@@ -19,30 +19,6 @@ namespace Muonroi.BuildingBlock.External.SeedWorks
             _dbSet = _dbBaseContext.Set<T>();
         }
 
-        public virtual async Task<T?> GetByIdAsync(int id)
-        {
-            try
-            {
-                return await Queryable.SingleOrDefaultAsync(c => c.Id == id).ConfigureAwait(false);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public virtual async Task<T?> GetByGuidAsync(Guid guid)
-        {
-            try
-            {
-                return await Queryable.SingleOrDefaultAsync(c => c.EntityId == guid).ConfigureAwait(false);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
         public virtual async Task<int> AddBatchAsync(IEnumerable<T> newEntities)
         {
             if (newEntities == null || !newEntities.Any())
@@ -132,17 +108,6 @@ namespace Muonroi.BuildingBlock.External.SeedWorks
             }
         }
 
-        public virtual async Task<List<T>> GetByConditionAsync(Expression<Func<T, bool>> predicate)
-        {
-            try
-            {
-                return await Queryable.Where(predicate).ToListAsync().ConfigureAwait(false);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
 
         public virtual T Add(T newEntity)
         {
@@ -156,30 +121,6 @@ namespace Muonroi.BuildingBlock.External.SeedWorks
                 newEntity.AddDomainEvent(new MEntityCreatedEvent<T>(newEntity));
                 _dbBaseContext.TrackEntity(newEntity);
                 return _dbSet.Add(newEntity).Entity;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public virtual async Task<bool> AnyAsync(int id)
-        {
-            try
-            {
-                return await Queryable.AnyAsync(c => c.Id == id).ConfigureAwait(false);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task<bool> AnyGuidAsync(Guid guid)
-        {
-            try
-            {
-                return await Queryable.AnyAsync(c => c.EntityId == guid).ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -267,69 +208,6 @@ namespace Muonroi.BuildingBlock.External.SeedWorks
             }
         }
 
-        public async Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null)
-        {
-            try
-            {
-                return predicate == null
-                    ? await Queryable.CountAsync().ConfigureAwait(false)
-                    : await Queryable.CountAsync(predicate).ConfigureAwait(false);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task<MPagedResult<TDto>> GetPagedAsync<TDto>(
-                    IQueryable<T> query,
-                    int pageIndex,
-                    int pageSize,
-                    Expression<Func<T, TDto>> selector,
-                    string? keyword = null,
-                    Expression<Func<T, bool>>? filter = null,
-                    Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null)
-                    where TDto : class
-        {
-            try
-            {
-                if (filter != null)
-                {
-                    query = query.Where(filter);
-                }
-
-                if (!string.IsNullOrEmpty(keyword))
-                {
-                    query = query.Where(x => EF.Functions.Like(x.ToString(), $"%{keyword}%"));
-                }
-
-                int totalRowCount = await query.CountAsync().ConfigureAwait(false);
-
-                if (orderBy != null)
-                {
-                    query = orderBy(query);
-                }
-
-                List<TDto> items = await query
-                    .Skip((pageIndex - 1) * pageSize)
-                    .Take(pageSize)
-                    .Select(selector)
-                    .ToListAsync()
-                    .ConfigureAwait(false);
-
-                return new MPagedResult<TDto>
-                {
-                    CurrentPage = pageIndex,
-                    PageSize = pageSize,
-                    RowCount = totalRowCount,
-                    Items = items
-                };
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
 
         public async Task<bool> SoftRestoreAsync(T entity)
         {
@@ -357,17 +235,6 @@ namespace Muonroi.BuildingBlock.External.SeedWorks
             }
         }
 
-        public async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
-        {
-            try
-            {
-                return await Queryable.FirstOrDefaultAsync(predicate).ConfigureAwait(false);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
         public async Task BulkInsertAsync(IEnumerable<T> entities)
         {
             try
