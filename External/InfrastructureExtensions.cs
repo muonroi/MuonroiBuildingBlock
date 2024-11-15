@@ -1,5 +1,7 @@
 ﻿
 
+
+
 namespace Muonroi.BuildingBlock.External
 {
     public static class InfrastructureExtensions
@@ -30,7 +32,10 @@ namespace Muonroi.BuildingBlock.External
 
         private static IServiceCollection AddControllersWithOptions(this IServiceCollection services)
         {
-            _ = services.AddControllers()
+            _ = services.AddControllers(options =>
+            {
+                options.Conventions.Add(new LowerCaseControllerNameConvention());
+            })
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
@@ -116,6 +121,18 @@ namespace Muonroi.BuildingBlock.External
             _ = app.UseMiddleware<MAuthenMiddleware<TDbContext, TPermission>>();
             _ = app.UseMiddleware<MExceptionMiddleware>();
             return app;
+        }
+
+        public static IServiceCollection AddConfigureHttpJson(this IServiceCollection services)
+        {
+            _ = services.ConfigureHttpJsonOptions(options =>
+            {
+                options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                options.SerializerOptions.WriteIndented = false;
+                options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
+            return services;
         }
 
         public static WebApplicationBuilder AddAutofacConfiguration(this WebApplicationBuilder builder)

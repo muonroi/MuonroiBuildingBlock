@@ -25,7 +25,7 @@ namespace Muonroi.BuildingBlock.External.Repositories
                 return result;
             }
 
-            MUser? existedUser = await _dbContext.Users.FirstOrDefaultAsync(x => x.UserName == request.Username, cancellationToken: cancellationToken);
+            MUser? existedUser = await Queryable.FirstOrDefaultAsync(x => x.UserName == request.Username, cancellationToken: cancellationToken);
 
             if (existedUser is null)
             {
@@ -49,7 +49,7 @@ namespace Muonroi.BuildingBlock.External.Repositories
         {
             MResponse<RefreshTokenResponseModel> result = new();
 
-            MUser? existedUser = await _dbContext.Users.FirstOrDefaultAsync(x => x.UserName == _authContext.CurrentUserGuid, cancellationToken: cancellationToken);
+            MUser? existedUser = await Queryable.FirstOrDefaultAsync(x => x.UserName == _authContext.CurrentUserGuid, cancellationToken: cancellationToken);
 
             if (existedUser is null)
             {

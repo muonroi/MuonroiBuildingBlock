@@ -1,4 +1,5 @@
-﻿namespace Muonroi.BuildingBlock.External.SeedWorks
+﻿
+namespace Muonroi.BuildingBlock.External.SeedWorks
 {
     public class MRepository<T> : IMRepository<T> where T : MEntity
     {
@@ -30,11 +31,112 @@
             }
         }
 
-        public async Task<T?> GetByGuidAsync(Guid guid)
+        public virtual async Task<T?> GetByGuidAsync(Guid guid)
         {
             try
             {
                 return await Queryable.SingleOrDefaultAsync(c => c.EntityId == guid).ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public virtual async Task<int> AddBatchAsync(IEnumerable<T> newEntities)
+        {
+            if (newEntities == null || !newEntities.Any())
+            {
+                return 0;
+            }
+
+            try
+            {
+                DateTime utcNow = DateTime.UtcNow;
+                foreach (T entity in newEntities)
+                {
+                    entity.CreatedDateTS = utcNow.GetTimeStamp(true);
+                    entity.LastModificationTimeTs = utcNow.GetTimeStamp(true);
+                    entity.CreatorUserId = string.IsNullOrEmpty(_authContext?.CurrentUserGuid)
+                        ? Guid.Empty
+                        : Guid.Parse(_authContext?.CurrentUserGuid ?? Guid.Empty.ToString());
+                    entity.EntityId = Guid.NewGuid();
+                    entity.AddDomainEvent(new MEntityCreatedEvent<T>(entity));
+                    _dbBaseContext.TrackEntity(entity);
+                }
+
+                await _dbSet.AddRangeAsync(newEntities).ConfigureAwait(false);
+                return await _dbBaseContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public virtual async Task<int> UpdateBatchAsync(Expression<Func<T, bool>> predicate, Action<T> updateAction)
+        {
+            try
+            {
+                List<T> entities = await Queryable.Where(predicate).ToListAsync().ConfigureAwait(false);
+                if (entities.Count == 0)
+                {
+                    return 0;
+                }
+
+                foreach (T? entity in entities)
+                {
+                    updateAction(entity);
+                    entity.LastModificationTimeTs = DateTime.UtcNow.GetTimeStamp(true);
+                    entity.LastModificationUserId = string.IsNullOrEmpty(_authContext?.CurrentUserGuid)
+                        ? null
+                        : Guid.Parse(_authContext?.CurrentUserGuid ?? Guid.Empty.ToString());
+                    entity.AddDomainEvent(new MEntityChangedEvent<T>(entity));
+                    _dbBaseContext.TrackEntity(entity);
+                }
+
+                return await _dbBaseContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public virtual async Task<int> DeleteBatchAsync(Expression<Func<T, bool>> predicate)
+        {
+            try
+            {
+                List<T> entities = await Queryable.Where(predicate).ToListAsync().ConfigureAwait(false);
+                if (entities.Count == 0)
+                {
+                    return 0;
+                }
+
+                foreach (T? entity in entities)
+                {
+                    entity.IsDeleted = true;
+                    entity.DeletedDateTS = DateTime.UtcNow.GetTimeStamp(true);
+                    entity.DeletedUserId = string.IsNullOrEmpty(_authContext?.CurrentUserGuid)
+                        ? null
+                        : Guid.Parse(_authContext?.CurrentUserGuid ?? Guid.Empty.ToString());
+                    entity.AddDomainEvent(new MEntityDeletedEvent<T>(entity));
+                    _dbBaseContext.TrackEntity(entity);
+                }
+
+                return await _dbBaseContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public virtual async Task<List<T>> GetByConditionAsync(Expression<Func<T, bool>> predicate)
+        {
+            try
+            {
+                return await Queryable.Where(predicate).ToListAsync().ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -164,5 +266,119 @@
                 await transaction.RollbackAsync();
             }
         }
+
+        public async Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null)
+        {
+            try
+            {
+                return predicate == null
+                    ? await Queryable.CountAsync().ConfigureAwait(false)
+                    : await Queryable.CountAsync(predicate).ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<MPagedResult<TDto>> GetPagedAsync<TDto>(
+                    IQueryable<T> query,
+                    int pageIndex,
+                    int pageSize,
+                    Expression<Func<T, TDto>> selector,
+                    string? keyword = null,
+                    Expression<Func<T, bool>>? filter = null,
+                    Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null)
+                    where TDto : class
+        {
+            try
+            {
+                if (filter != null)
+                {
+                    query = query.Where(filter);
+                }
+
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    query = query.Where(x => EF.Functions.Like(x.ToString(), $"%{keyword}%"));
+                }
+
+                int totalRowCount = await query.CountAsync().ConfigureAwait(false);
+
+                if (orderBy != null)
+                {
+                    query = orderBy(query);
+                }
+
+                List<TDto> items = await query
+                    .Skip((pageIndex - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(selector)
+                    .ToListAsync()
+                    .ConfigureAwait(false);
+
+                return new MPagedResult<TDto>
+                {
+                    CurrentPage = pageIndex,
+                    PageSize = pageSize,
+                    RowCount = totalRowCount,
+                    Items = items
+                };
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> SoftRestoreAsync(T entity)
+        {
+            try
+            {
+                if (entity.IsDeleted)
+                {
+                    entity.IsDeleted = false;
+                    entity.DeletedDateTS = null;
+                    entity.DeletedUserId = null;
+                    entity.LastModificationTimeTs = DateTime.UtcNow.GetTimeStamp(true);
+                    entity.LastModificationUserId = string.IsNullOrEmpty(_authContext?.CurrentUserGuid)
+                        ? null
+                        : Guid.Parse(_authContext?.CurrentUserGuid ?? Guid.Empty.ToString());
+                    entity.AddDomainEvent(new MEntityChangedEvent<T>(entity));
+                    _dbBaseContext.TrackEntity(entity);
+
+                    return await _dbBaseContext.SaveChangesAsync().ConfigureAwait(false) > 0;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
+        {
+            try
+            {
+                return await Queryable.FirstOrDefaultAsync(predicate).ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        public async Task BulkInsertAsync(IEnumerable<T> entities)
+        {
+            try
+            {
+                await _dbBaseContext.BulkInsertAsync(entities.ToList()).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Bulk insert failed.", ex);
+            }
+        }
+
     }
 }

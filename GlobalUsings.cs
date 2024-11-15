@@ -130,3 +130,5 @@ global using RedisCacheProvider = Muonroi.BuildingBlock.External.Caching.Distrib
 global using Type = System.Type;
 global using JsonSerializer = System.Text.Json.JsonSerializer;
 global using Muonroi.BuildingBlock.External.DI;
+global using Muonroi.BuildingBlock.External.Controller.Conventions;
+global using System.Linq.Expressions;
