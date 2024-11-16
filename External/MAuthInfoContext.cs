@@ -16,5 +16,10 @@
         public string Language { get; set; } = string.Empty;
         public string Caller { get; set; } = string.Empty;
         public bool IsAuthenticated { get; set; }
+
+        public string GetAccessToken()
+        {
+            return AccessToken ?? string.Empty;
+        }
     }
 }

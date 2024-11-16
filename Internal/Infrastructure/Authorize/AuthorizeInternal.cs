@@ -78,6 +78,7 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
             await ResetLoginAttemptOnSuccess(existedUser, loginAttemptHistory, dbContext, cancellationToken);
             return result;
         }
+
         internal static async Task<MResponse<RefreshTokenResponseModel>> ResolveRefreshToken<TDbContext, TPermission>(
             this TDbContext dbContext,
             RefreshTokenRequestModel request,
@@ -136,6 +137,25 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
                 AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken
             };
+            return result;
+        }
+
+        internal static async Task<MResponse<string>> ResolveTokenValidity<TDbContext>(this TDbContext dbContext, string tokenValidity, CancellationToken cancellationToken)
+            where TDbContext : MDbContext
+        {
+            MResponse<string> result = new();
+            if (string.IsNullOrEmpty(tokenValidity))
+            {
+                result.AddErrorMessage(nameof(SystemEnum.InvalidCredentials));
+                return result;
+            }
+            MRefreshToken? refresh = await dbContext.RefreshTokens.SingleOrDefaultAsync(x => x.TokenValidityKey == tokenValidity, cancellationToken: cancellationToken);
+            if (refresh is null || refresh.IsDeleted || refresh.IsRevoked)
+            {
+                result.AddErrorMessage(nameof(SystemEnum.InvalidCredentials));
+                return result;
+            }
+            result.Result = refresh.Token;
             return result;
         }
 

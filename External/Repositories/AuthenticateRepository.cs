@@ -1,7 +1,4 @@
-﻿
-
-
-namespace Muonroi.BuildingBlock.External.Repositories
+﻿namespace Muonroi.BuildingBlock.External.Repositories
 {
     public class AuthenticateRepository<TDbContext, TPermission>(
     MAuthenticateTokenHelper<TPermission> tokenHelper,
@@ -61,6 +58,18 @@ namespace Muonroi.BuildingBlock.External.Repositories
 
             return result;
 
+        }
+
+        public async Task<MResponse<string>> ValidateTokenValidity(string tokenValidity, CancellationToken cancellationToken)
+        {
+            MResponse<string> result = new();
+            if (string.IsNullOrEmpty(tokenValidity))
+            {
+                result.AddApiErrorMessage(nameof(SystemEnum.InvalidTokenValidity), [_authContext.CurrentUsername]);
+                return result;
+            }
+            result = await _dbContext.ResolveTokenValidity(tokenValidity, cancellationToken);
+            return result;
         }
 
         private static bool IsRequestInvalid(LoginRequestModel request, out string errorMessage)

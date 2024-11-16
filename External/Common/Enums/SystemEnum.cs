@@ -59,6 +59,11 @@
         /// <summary>
         /// Role does not have permission.
         /// </summary>
-        RolePermissionNotFound
+        RolePermissionNotFound,
+
+        /// <summary>
+        /// Invalid token validity.
+        /// </summary>
+        InvalidTokenValidity
     }
 }
