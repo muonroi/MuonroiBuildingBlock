@@ -11,6 +11,7 @@ namespace Muonroi.BuildingBlock.External
         MPaginationConfig paginationConfig)
     {
         protected MPaginationConfig PaginationConfig => paginationConfig;
+        protected MAuthenticateInfoContext TokenInfo => tokenInfo;
         protected int DefaultPageIndex => paginationConfig.DefaultPageIndex;
         protected int DefaultPageSize => paginationConfig.DefaultPageSize;
         protected int MaxPageSize => paginationConfig.MaxPageSize;
