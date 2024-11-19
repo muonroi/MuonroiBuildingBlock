@@ -132,3 +132,4 @@ global using JsonSerializer = System.Text.Json.JsonSerializer;
 global using Muonroi.BuildingBlock.External.DI;
 global using Muonroi.BuildingBlock.External.Controller.Conventions;
 global using System.Linq.Expressions;
+global using MySqlX.XDevAPI.Common;

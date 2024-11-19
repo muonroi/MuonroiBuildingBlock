@@ -1,5 +1,11 @@
 ﻿
 
+
+
+
+
+
+
 namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
 {
     public static class AuthorizeInternal
@@ -19,7 +25,6 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
             if (refresh is null || refresh.IsDeleted || refresh.IsRevoked)
             {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                await context.Response.WriteAsync("Unauthorized: Invalid token.");
                 return;
             }
             context.Items.Add(nameof(MAuthenticateInfoContext.IsAuthenticated), true);
@@ -89,13 +94,29 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
             where TDbContext : MDbContext
             where TPermission : Enum
         {
-            ClaimsPrincipal principal = GetPrincipalFromExpiredToken(request.AccessToken, out string message, mTokenInfo);
-
-            if (!string.IsNullOrEmpty(message))
+            bool isValidToken = await VerifyPrincipalFromExpiredToken(request.AccessToken, mTokenInfo);
+            if (!isValidToken)
             {
                 result.AddErrorMessage(nameof(SystemEnum.InvalidCredentials));
                 return result;
             }
+            RSA rsa = RSA.Create();
+            rsa.ImportFromPem(mTokenInfo.PublicKey.ToCharArray());
+            TokenValidationParameters validationParameters = new()
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new RsaSecurityKey(rsa),
+                ClockSkew = TimeSpan.Zero,
+                ValidIssuer = mTokenInfo.Issuer,
+                ValidAudience = mTokenInfo.Audience
+            };
+
+            JwtSecurityTokenHandler tokenHandler = new();
+
+            ClaimsPrincipal principal = new JwtSecurityTokenHandler().ValidateToken(request.AccessToken, validationParameters, out SecurityToken validatedToken);
 
             List<Claim> claims = principal.Claims.ToList();
             string? userIdentifier = claims.Find(c => c.Type == ClaimConstants.UserIdentifier)?.Value ?? string.Empty;
@@ -205,34 +226,34 @@ namespace Muonroi.BuildingBlock.Internal.Infrastructure.Authorize
                 existedUser.IsActive = false;
             }
         }
-        private static ClaimsPrincipal GetPrincipalFromExpiredToken(string token, out string message, MTokenInfo mTokenInfo)
+
+        private static async Task<bool> VerifyPrincipalFromExpiredToken(string token, MTokenInfo mTokenInfo)
         {
-            message = string.Empty;
-            TokenValidationParameters tokenValidationParameters = new()
+            RSA rsa = RSA.Create();
+            rsa.ImportFromPem(mTokenInfo.PublicKey.ToCharArray());
+
+            TokenValidationParameters validationParameters = new()
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateLifetime = false,
                 ValidateIssuerSigningKey = true,
-
+                IssuerSigningKey = new RsaSecurityKey(rsa),
+                ClockSkew = TimeSpan.Zero,
                 ValidIssuer = mTokenInfo.Issuer,
-                ValidAudience = mTokenInfo.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(mTokenInfo.SigningKeys))
+                ValidAudience = mTokenInfo.Audience
             };
-            try
+
+            JwtSecurityTokenHandler tokenHandler = new();
+
+            TokenValidationResult result = await tokenHandler.ValidateTokenAsync(token, validationParameters);
+
+            if (!result.IsValid)
             {
-                JwtSecurityTokenHandler tokenHandler = new();
-                ClaimsPrincipal principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-                return securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase)
-                    ? throw new SecurityTokenException("Invalid token")
-                    : principal;
+                return false;
             }
-            catch (SecurityTokenException ex)
-            {
-                message = ex.Message;
-                return new ClaimsPrincipal();
-            }
-        }//
+            return true;
+        }
         private static async Task RevokeRefreshToken<TDbContext>(MRefreshToken token, Guid userId, TDbContext dbContext, string reason = "")
             where TDbContext : MDbContext
         {

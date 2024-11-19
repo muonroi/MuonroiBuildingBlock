@@ -73,12 +73,9 @@ namespace Muonroi.BuildingBlock.External
             return app;
         }
 
-        public static WebApplicationBuilder AddAppConfigurations(this WebApplicationBuilder builder)
+        public static WebApplicationBuilder AddAppConfigurationsProduct(this WebApplicationBuilder builder)
         {
-            _ = builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                   .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                   .AddEnvironmentVariables();
-
+            _ = builder.Configuration.AddJsonFile("appsettings." + builder.Environment.EnvironmentName + ".json", optional: true, reloadOnChange: true).AddEnvironmentVariables();
             return builder;
         }
     }

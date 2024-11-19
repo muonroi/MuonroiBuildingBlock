@@ -14,7 +14,7 @@
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "An unhandled exception occurred while processing the request.");
+                _logger.Error(ex, "An unhandled exception occurred.");
                 await HandleExceptionAsync(context, ex);
             }
         }

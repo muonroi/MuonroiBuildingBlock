@@ -117,9 +117,8 @@ namespace Muonroi.BuildingBlock.External
             where TDbContext : MDbContext
             where TPermission : Enum
         {
-            // Add custom exception handling middleware
-            _ = app.UseMiddleware<MAuthenMiddleware<TDbContext, TPermission>>();
             _ = app.UseMiddleware<MExceptionMiddleware>();
+            _ = app.UseMiddleware<MAuthenMiddleware<TDbContext, TPermission>>();
             return app;
         }
 
@@ -164,6 +163,8 @@ namespace Muonroi.BuildingBlock.External
                 context.Response.Redirect("/swagger");
                 return Task.CompletedTask;
             });
+
+            _ = app.UseExceptionHandler("/error");
 
             return app;
         }

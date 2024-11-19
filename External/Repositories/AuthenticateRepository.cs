@@ -46,7 +46,7 @@
         {
             MResponse<RefreshTokenResponseModel> result = new();
 
-            MUser? existedUser = await Queryable.FirstOrDefaultAsync(x => x.UserName == _authContext.CurrentUserGuid, cancellationToken: cancellationToken);
+            MUser? existedUser = await Queryable.FirstOrDefaultAsync(x => x.EntityId == Guid.Parse(_authContext.CurrentUserGuid), cancellationToken: cancellationToken);
 
             if (existedUser is null)
             {
