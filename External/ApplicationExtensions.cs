@@ -73,7 +73,7 @@ namespace Muonroi.BuildingBlock.External
             return app;
         }
 
-        public static WebApplicationBuilder AddAppConfigurationsProduct(this WebApplicationBuilder builder)
+        public static WebApplicationBuilder AddAppConfiguration(this WebApplicationBuilder builder)
         {
             _ = builder.Configuration.AddJsonFile("appsettings." + builder.Environment.EnvironmentName + ".json", optional: true, reloadOnChange: true).AddEnvironmentVariables();
             return builder;
