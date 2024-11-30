@@ -1,4 +1,6 @@
-﻿namespace Muonroi.BuildingBlock.External.Common.Enums
+﻿
+
+namespace Muonroi.BuildingBlock.External.Common.Enums
 {
     public enum LogType
     {

@@ -5,12 +5,12 @@ namespace Muonroi.BuildingBlock.External.SeedWorks
     {
         public string Serialize<T>(T obj)
         {
-            return JsonSerializer.Serialize(obj);
+            return NewtonsoftJsonSerializer.SerializeObject(obj);
         }
 
         public T? Deserialize<T>(string text)
         {
-            return JsonSerializer.Deserialize<T>(text);
+            return NewtonsoftJsonSerializer.DeserializeObject<T>(text);
         }
     }
 }

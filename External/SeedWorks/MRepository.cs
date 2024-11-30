@@ -113,12 +113,23 @@ namespace Muonroi.BuildingBlock.External.SeedWorks
         {
             try
             {
+                T? existingEntity = _dbBaseContext.Set<T>().Local
+                    .FirstOrDefault(e => e.EntityId == newEntity.EntityId);
+
+                if (existingEntity != null)
+                {
+                    throw new InvalidOperationException("Entity already exists in the context.");
+                }
+
                 DateTime utcNow = DateTime.UtcNow;
                 newEntity.CreatedDateTS = utcNow.GetTimeStamp(true);
                 newEntity.LastModificationTimeTs = utcNow.GetTimeStamp(true);
-                newEntity.CreatorUserId = string.IsNullOrEmpty(_authContext?.CurrentUserGuid) ? Guid.Empty : Guid.Parse(_authContext?.CurrentUserGuid ?? Guid.Empty.ToString());
+                newEntity.CreatorUserId = string.IsNullOrEmpty(_authContext?.CurrentUserGuid)
+                    ? Guid.Empty
+                    : Guid.Parse(_authContext?.CurrentUserGuid ?? Guid.Empty.ToString());
                 newEntity.EntityId = Guid.NewGuid();
                 newEntity.AddDomainEvent(new MEntityCreatedEvent<T>(newEntity));
+
                 _dbBaseContext.TrackEntity(newEntity);
                 return _dbSet.Add(newEntity).Entity;
             }
@@ -128,15 +139,31 @@ namespace Muonroi.BuildingBlock.External.SeedWorks
             }
         }
 
+
         public virtual Task<bool> DeleteAsync(T deleteEntity)
         {
             try
             {
+                T? existingEntity = _dbBaseContext.Set<T>().Local
+                    .FirstOrDefault(e => e.EntityId == deleteEntity.EntityId);
+
+                if (existingEntity != null)
+                {
+                    _dbBaseContext.Entry(existingEntity).CurrentValues.SetValues(deleteEntity);
+                }
+                else
+                {
+                    _ = _dbSet.Attach(deleteEntity);
+                }
+
                 deleteEntity.IsDeleted = true;
                 deleteEntity.DeletedDateTS = DateTime.UtcNow.GetTimeStamp(true);
-                deleteEntity.DeletedUserId = string.IsNullOrEmpty(_authContext?.CurrentUserGuid) ? null : Guid.Parse(_authContext?.CurrentUserGuid ?? Guid.Empty.ToString());
+                deleteEntity.DeletedUserId = string.IsNullOrEmpty(_authContext?.CurrentUserGuid)
+                    ? null
+                    : Guid.Parse(_authContext?.CurrentUserGuid ?? Guid.Empty.ToString());
                 deleteEntity.AddDomainEvent(new MEntityDeletedEvent<T>(deleteEntity));
-                _dbBaseContext.TrackEntity(deleteEntity);
+
+                _dbBaseContext.Entry(deleteEntity).State = EntityState.Modified;
                 return Task.FromResult(true);
             }
             catch (Exception)
@@ -145,21 +172,38 @@ namespace Muonroi.BuildingBlock.External.SeedWorks
             }
         }
 
+
         public virtual T Update(T updateEntity)
         {
             try
             {
+                T? existingEntity = _dbBaseContext.Set<T>().Local
+                    .FirstOrDefault(e => e.EntityId == updateEntity.EntityId);
+
+                if (existingEntity != null)
+                {
+                    _dbBaseContext.Entry(existingEntity).CurrentValues.SetValues(updateEntity);
+                }
+                else
+                {
+                    _ = _dbSet.Attach(updateEntity);
+                }
+
                 updateEntity.LastModificationTimeTs = DateTime.UtcNow.GetTimeStamp(true);
-                updateEntity.LastModificationUserId = string.IsNullOrEmpty(_authContext?.CurrentUserGuid) ? null : Guid.Parse(_authContext?.CurrentUserGuid ?? Guid.Empty.ToString());
+                updateEntity.LastModificationUserId = string.IsNullOrEmpty(_authContext?.CurrentUserGuid)
+                    ? null
+                    : Guid.Parse(_authContext?.CurrentUserGuid ?? Guid.Empty.ToString());
                 updateEntity.AddDomainEvent(new MEntityChangedEvent<T>(updateEntity));
-                _dbBaseContext.TrackEntity(updateEntity);
-                return _dbSet.Update(updateEntity).Entity;
+
+                _dbBaseContext.Entry(updateEntity).State = EntityState.Modified;
+                return updateEntity;
             }
             catch (Exception)
             {
                 throw;
             }
         }
+
 
         public virtual async Task ExecuteTransactionAsync(Func<Task<MVoidMethodResult>> action)
         {

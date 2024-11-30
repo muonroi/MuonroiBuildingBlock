@@ -27,7 +27,7 @@
         {
             try
             {
-                return await _dbSet.AsNoTracking().SingleOrDefaultAsync((c) => c.Id == id && !c.IsDeleted).ConfigureAwait(continueOnCapturedContext: false);
+                return await Queryable.AsNoTracking().SingleOrDefaultAsync((c) => c.Id == id).ConfigureAwait(continueOnCapturedContext: false);
             }
             catch (Exception)
             {
@@ -39,7 +39,9 @@
         {
             try
             {
-                return await _dbSet.AsNoTracking().SingleOrDefaultAsync((c) => c.EntityId == guid && !c.IsDeleted).ConfigureAwait(continueOnCapturedContext: false);
+                return await Queryable.AsNoTracking()
+                    .SingleOrDefaultAsync((c) => c.EntityId == guid)
+                    .ConfigureAwait(continueOnCapturedContext: false);
             }
             catch (Exception)
             {
