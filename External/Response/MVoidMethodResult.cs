@@ -35,17 +35,18 @@
             AddErrorMessage(errorResult);
         }
 
-        public void AddErrorMessage(string exceptionErrorMessage, string exceptionStackTrace = "")
+        public void AddErrorMessage(string errorMessage, string exceptionStackTrace = "")
         {
-            AddErrorMessage("ERR_COM_API_SERVER_ERROR", "API_ERROR", exceptionErrorMessage, exceptionStackTrace, []);
+            AddErrorMessage("ERR_COM_API_SERVER_ERROR", errorMessage, exceptionStackTrace, []);
         }
 
-        private void AddErrorMessage(string errorCode, string errorMessage, string exceptionErrorMessage, string exceptionStackTrace, params object[] arguments)
+        private void AddErrorMessage(string errorCode, string errorMessage, string exceptionStackTrace, params object[] arguments)
         {
+            _ = exceptionStackTrace; // TODO: Implement exceptionStackTrace
             _errorMessages.Add(new MErrorResult
             {
                 ErrorCode = errorCode,
-                ErrorMessage = "Error: " + errorMessage + ", Exception Message: " + exceptionErrorMessage + ", Stack Trace: " + exceptionStackTrace,
+                ErrorMessage = errorMessage,
                 ErrorValues = [.. arguments]
             });
         }
@@ -55,7 +56,7 @@
             ObjectResult objectResult = new(this);
             if (!StatusCode.HasValue)
             {
-                objectResult.StatusCode = 500;
+                objectResult.StatusCode = StatusCodes.Status200OK;
                 return objectResult;
             }
 

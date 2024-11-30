@@ -207,5 +207,17 @@
             }
         }
 
+        public async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate)
+        {
+            try
+            {
+                return await Queryable.AnyAsync(predicate).ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
     }
 }

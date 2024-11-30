@@ -22,7 +22,8 @@
                 return objectResult;
             }
 
-            objectResult.StatusCode = IsOK ? Result != null ? 200 : 204 : 500;
+            objectResult.StatusCode = StatusCodes.Status200OK
+                ;
 
             return objectResult;
         }

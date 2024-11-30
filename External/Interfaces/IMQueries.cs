@@ -29,4 +29,6 @@ public interface IMQueries<T> where T : MEntity
         where TDto : class;
 
     Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
+
+    Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
 }
